@@ -100,8 +100,7 @@
 %\raggedright
 
 \begin{center}
-  {\huge\sffamily\bfseries MA2108S Cheatsheet} \huge\bfseries\\
-  for AY25/26
+\huge\bfseries MA2108S AY25/26
 \end{center}
 \setlength{\premulticols}{0pt}
 \setlength{\postmulticols}{0pt}
@@ -146,8 +145,6 @@ H_n \le G_n \le A_n
 \\
 Derived: [1] $\bigl| |a| - |b| \bigr| \le |a-b|$, [2] $|a-b| \le |a|+|b|$.
 
-
-
 \subsubsection{Neighbourhood}
 For any $a \in \mathbb{R}$ and $\epsilon > 0$, the \deff{$\epsilon$-neighbourhood of $a$} is the set:
 \[
@@ -157,8 +154,6 @@ x \in \mathbb{R}: |x - a| < \epsilon
 \]
 
 \thm{Theorem 2.2.8} For $a \in \mathbb{R}$, if $x \in V_\epsilon(a)$ for every $\epsilon > 0$, then $x = a$.
-
-
 
 
 
@@ -355,6 +350,14 @@ Tests for infinite series' convergence:
     \item \deff{Comparison Test} - For $(x_n), (y_n)$ with some $K \in \mathbb{N}$, s.t. $n \ge K \implies 0 \le x_n \le y_n$. Then [1] $\sum y_n$ converges $\implies$ $\sum x_n$ converges, and [2] $\sum x_n$ diverges $\implies$ $\sum y_n$ diverges.
     
     \item \deff{Limit Comparison Test} - For \textbf{strictly positive} $(x_n), (y_n)$ with limit $r = \lim_{n \to \infty} (\frac{x_n}{y_n})$. Then [1] if $r = 0$, $\sum y_n$ converges $\implies$ $\sum x_n$ converges. [2] if $r > 0$, $\sum y_n$ converges iff $\sum x_n$ converges.
+
+    \item \deff{Cauchy Condensation Test} - Suppose $\{a_n\}$ decreasing and every term is positive. Define $b_k:=2^ka_{2^k}$. $\sum_{n=1}^\infty a_n$ convergent iff $\sum_{n=1}^\infty b_n$ convergent.
+
+    \item \deff{Leibniz Test} - Suppose $a_n \geq 0$ decreasing and $\lim_{n\rightarrow\infty} a_n = 0$. Then $\sum_{n=1}^{\infty}(-1)^{n - 1}a_n$ convergent. 
+
+    \item \deff{Dirichlet's Test} Let $\{a_n\}$ satisfy that its partial sums $\{A_n=\sum_{k=1}^n a_n\}$ is bounded, and $\{b_n\}$ be a positive decreasing sequence approaching zero. Then $\sum_{n=1}^\infty a_nb_n$ is convergent.
+
+    \item \deff{Abel's Test} Let $\{a_n\}$ satisfy that its partial sums $\sum_{n=1}^\infty a_n$ is convergent. Let $\{b_n\}$ be a monotone and bounded sequence. Then $\sum_{n=1}^\infty a_nb_n$ is convergent.
 \end{itemize}
 
 
@@ -370,13 +373,25 @@ Tests for absolutely convergence:
     \item Limit Comparison Test - Consider convergence of positive sequences $|x_n|$ and $|y_n|$ if $(x_n), (y_n)$ non-negative.
     \item \deff{Root Test} - For $(x_n)$, [1] if $\exists r \in \mathbb{R}, 0 < r < 1$ and $K \in \mathbb{N}$ s.t. $|x_n|^{1/n} \le r, \ \forall n \ge K$, then $\sum x_n$ is abs. convergent. [2] If $\exists r \in \mathbb{R}, r > 1$ and $K \in \mathbb{N}$ s.t. $|x_n|^{1/n} \ge r > 1, \ \forall n \ge K$, then $\sum x_n$ is \textbf{divergent}.
     \item \deff{Ratio Test} - For $(x_n)$ nonzero, [1] if $\exists r \in \mathbb{R}, 0 < r < 1$ and $K \in \mathbb{N}$ s.t. $|\frac{x_{n+1}}{x_n}| \le r, \ \forall n \ge K$, then $\sum x_n$ is abs. convergent. [2] If $\exists K \in \mathbb{N}$ s.t. $|\frac{x_{n+1}}{x_n}| \ge 1, \ \forall n \ge K$, then $\sum x_n$ is \textbf{divergent}.
+
 \end{itemize}
 
 % Abs convg tests
 % TODO: check if finishes
 
+\subsection{Abel's Summation Formula}
+Let $A_n = \sum_{k=1}^n a_n$.For any $q>p$, 
+\[
+\sum_{n=p}^q a_n b_n = A_qb_q - A_{p-1}b_p+\sum_{n=p}^{q-1}A_n(b_n-b_{n+1}).
+\]
 
-
+\section{Useful Results}
+\[ 
+\bigg(1+\frac{1}{n}\bigg)^n < e < \bigg(1+\frac{1}{n}\bigg)^{n + 1} \Rightarrow \frac{1}{n+1} < \log\bigg(\frac{n+1}{n}\bigg) < \frac{1}{n}
+\]
+\[
+\sum_{n=1}^\infty \frac{1}{n\log n} \text{ is divergent}
+\]
 
 \section{4. Limits}
 For $A \subseteq \mathbb{R}$, $c$ is the \deff{Cluster Point} of $A$ iff. $\forall \delta > 0$, there exists $x \in A$ s.t. $0< |x-c| < \delta$.
