@@ -1,0 +1,300 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Original Source: Dave Richeson (divisbyzero.com), Dickinson College
+% Modified By Matthew Yeo
+% 
+% A one-size-fits-all LaTeX cheat sheet. Kept to two pages, so it 
+% can be printed (double-sided) on one piece of paper
+% 
+% Feel free to distribute this example, but please keep the referral
+% to divisbyzero.com
+% 
+% Guidance on the use of the Overleaf logos can be found here:
+% https://www.overleaf.com/for/partners/logos 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt,landscape,letterpaper]{article}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{physics}  % for vectors
+\usepackage{bbm}  % for mathbb-ed digits
+%\usepackage{fonts}
+\usepackage{multicol,multirow}
+\usepackage{spverbatim}
+\usepackage{graphicx}
+\usepackage{ifthen}
+\usepackage[landscape]{geometry}
+\usepackage[colorlinks=true,urlcolor=olgreen]{hyperref}
+\usepackage{booktabs}
+\usepackage{fontspec}
+\setmainfont[Ligatures=TeX]{TeX Gyre Pagella}
+\setsansfont{Fira Sans}
+\setmonofont{Inconsolata}
+\usepackage{unicode-math}
+\usepackage{listings}
+\usepackage{minted}
+\setmathfont{TeX Gyre Pagella Math}
+\usepackage{microtype}
+\usepackage{ulem}  % cuz \underline affected by everymath
+\usepackage{empheq}
+
+% new:
+\def\MT@is@uni@comp#1\iffontchar#2\else#3\fi\relax{%
+  \ifx\\#2\\\else\edef\MT@char{\iffontchar#2\fi}\fi
+}
+\makeatother
+
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+    { \geometry{margin=0.4in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+\pagestyle{empty}
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\sffamily\large}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\sffamily\normalsize\itshape}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\itshape}}
+\makeatother
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+% -----------------------------------------------------------------------
+
+\usepackage{academicons}
+
+\begin{document}
+
+\definecolor{mathBlue}{cmyk}{1,.72,0,.38}
+\definecolor{defOrange}{cmyk}{0, 0.5, 1, 0.3}
+\definecolor{codeInlineRed}{cmyk}{0, 0.9, 0.9, 0.45}
+\definecolor{theoremRed}{cmyk}{0, 0.9, 0.9, 0.45}
+% Note: code and thm color are pretty similar, but typically they wont appear in the same file. Both are set to be dim so that the file is not overwhelmed by bright colors (since deff organe is quite bright).
+
+\everymath{\color{mathBlue}}
+\everydisplay{\color{mathBlue}}
+
+% for vector notation in this module
+\newcommand{\vect}[1]{\pmb{#1}}
+\newcommand{\deff}[1]{\textcolor{defOrange}{\textbf{#1}}}
+\newcommand{\codein}[1]{\textcolor{codeInlineRed}{\texttt{#1}}}
+\newcommand{\citeqn}[1]{\underline{\textit{#1}}}
+\newcommand{\thm}[1]{
+    \color{theoremRed}{
+        \uline{{\textbf{#1}}}
+    }
+    \color{black}
+}
+
+\footnotesize
+%\raggedright
+
+\setlength{\premulticols}{0pt}
+\setlength{\postmulticols}{0pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{1.8em}
+\begin{multicols}{3}
+
+
+
+
+% -----------------------------------------------------------------------
+\begin{center}
+\huge\bfseries CS2030S MT AY25/26
+\end{center}
+\section{1. Types}
+% \subsubsection{}
+S is a subtype of T, i.e. S <: T if a piece of code written for variables of type T can be safely used on variables of type S. 
+The subtyping relationship in general must satisfy two properties:
+\begin{enumerate}
+    \item \deff{Reflexive}: For any type S, we have S <: S
+    \item \deff{Transitive}: If S <: T and T <: U, then S <: U
+\end{enumerate}
+
+\subsection{Primitive Types} 
+\verb|byte| <: \verb|short| <: \verb|int| <: \verb|long| <: \verb|float| <: \verb|double|\\
+\verb|char| <: \verb|int|
+
+\subsection{Reference Types}
+There are only two kinds of types in Java. Apart from primitive types, all other types (objects) are \deff{reference types}.\\
+If an Object is declared but \textbf{not} initialized, e.g. \verb|Circle c1;|, \verb|c1| will be initialized to \verb|null|, meaning "this variable does not refer to any object." 
+
+\subsection{Liskov Substitution Principle}
+If S <: T, then
+\begin{itemize}
+    \item Any property of T should also be a property of S.
+    \item An object of type T can be replaced by an object of type S without changing some desirable property of the program.
+\end{itemize}
+\textbf{VIOLATION} if subclass changes the behaviour of superclass - some property no longer holds.
+
+\subsubsection{Preventing Inheritance and Overriding}
+\verb|final| keyword can be used 
+\begin{enumerate}
+    \item in class declaration to prevent class from being inherited.
+    \item in method declaration to prevent method from being overridden.
+    \item in field declaration to prevent re-assignment.
+\end{enumerate}
+
+\subsection{Casting}
+Only type cast explicitly if we can prove that it is safe.
+
+\subsection{Variance}
+Let C(T) be a complex type based on type T. Then C is:
+
+\begin{itemize}
+    \item \textbf{covariant} if S <: T implies C(S) <: C(T)
+    \item \textbf{contravariant} if S <: T implies C(T) <: C(S)
+    \item \textbf{invariant} if C is neither above.
+\end{itemize}
+Java array is covariant. (S <: T implies S[] <: T[])
+
+\section{2. OOP Principles}
+\subsection{Encapsulation}
+\begin{itemize}
+        \item \deff{Encapsulation} = bundling data (fields) with operation (methods) that manipulate that data to maintain an \textbf{abstraction barrier} between implementation and usage.
+    \item Realised in Java via classes/objects.
+    \item \textbf{Goal}: class is responsible for keeping its own state consistent; clients ineteract via methods (not internals)
+\end{itemize}
+
+
+\subsection{Information Hiding}
+\begin{itemize}
+    \item \deff{Information hiding} enforces the abstraction barrier in practice: clients should only use the public interface and not rely on representation.
+    \item Directly accessing fields may leak representation assumptions; changing representation then breaks client code.
+    \item With hidden fields, \textbf{constructors} become th safe way to create valid objects.
+\end{itemize}
+
+\subsection{Tell, Don't Ask}
+\begin{itemize}
+    \item Tell objects what to do instead of asking for internal data and doing logic in client.
+    \item Getters and setters (accessors/mutators) are common but \textbf{can weaken encapsulation, increase coupling, and leak implementation details} when used indiscriminately.
+\end{itemize}
+
+\subsection{Inheritance}
+\begin{itemize}
+    \item Use inheritance to model a IS-A relationship; use composition for a HAS-A relationship. 
+    \item Inheritance must preserve the meaning of subtyping or designs can become weird or brittle.
+\end{itemize}
+
+\subsection{Method Overriding}
+\deff{Overriding}: subclass defines an instance method with same method descriptor (signature + return type) as parent's method.
+\begin{itemize}
+    \item Requires \textbf{identical method signature} for polymorphism to work correctly.
+    \item Uses \textbf{dynamic binding}.
+    \item Use \verb|@Override| to get compiler to check for overriding.
+\end{itemize}
+
+\subsection{Method Overloading}
+\deff{Overloading}: Declaring a method with the same name but different parameter list (types, order, arity).
+\begin{itemize}
+    \item Resolved entirely at compile time unlike overriding.
+    \item Chaning only parameter names or only return type $\not=$ overloading.
+    \item Selected overloaded method to run depends on \textbf{argument CTT}.
+\end{itemize}
+
+
+\subsection{Polymorphism}
+\deff{Polymorphism}: runtime method selection based on runtime type (dynamic binding)\\
+
+\deff{Dynamic Binding} - a 2-Step Process:
+\subsubsection{During Compile Time}
+CTT(target) used to determine method descriptor of method invoked. If CTT(target) = C, compiler searches for all methods in C (including inherited methods) that can be invoked on given argument and given return type. \textbf{Most specific method} is chosen.\\
+If Java fails to determine a single most specific method, compilation error thrown.
+
+\subsubsection{During Run Time}
+Method descriptor from Step 1 (e.g. \verb|boolean equals(Object)|) retrieve. RTT(target) = R is determined. Java then looks for first accessible method with matching descriptor in R, followed by parent class etc. until root \verb|Object|. 
+
+\subsubsection{Class Methods}
+Dynamic Binding applies to instance methods but \textbf{not to class methods}. Class method to invoke is resolved statically and fixed at compile time. RTT(target) ignored.
+
+\section{3. Abstract Class \& Interface}
+\subsection{Abstract Classes}
+A class that is so general that it cannot be instantiated. Useful if possibly one or more of its instance methods cannot be implemented without further details.\\
+Abstract class can contain multiple fields and multiple methods (incl. class methods). Class with \textit{at least one} abstract instance method must be declared abstract, but abstract class \textit{may have no } abstract method. 
+\begin{verbatim}
+abstract class Shape {
+    private int numOfAxesOfSymmetry;
+    public boolean isSymmetric() {
+        return numOfAxesOfSymmetry > 0;
+    }
+    abstract public double getArea(); 
+    //any concrete subclass must @Override to implement
+}
+\end{verbatim}
+
+\subsection{Interface}
+\begin{itemize}
+    \item \deff{Interface} models behaviour/capability.
+    \item Methods are \verb|public abstract| by default.
+    \item class can extend only 1 superclass but implement multiple interfaces; interfaces can extend other interfaces.
+\end{itemize}
+
+\begin{verbatim}
+interface I {...}
+class A {...}
+class B {...} implements I
+
+I i; A a; B b;
+i = b; //compiles: B <: I
+b = i; //does not compile:  I </: B
+i = a; //does not compile: A </: I
+
+(I) a; 
+//compiles though A </: I, as subtype of A could implement I.
+\end{verbatim}
+
+%Wrapper Class
+\section{4. Wrapper Class}
+
+\subsection{Auto-boxing \& Unboxing}
+\begin{verbatim}
+Integer i = 4; //auto-boxing
+int j = i; //unboxing
+\end{verbatim}
+\begin{itemize}
+    \item All primitive wrapper class objects are immutable, so every time a wrapper class object is updated, a new object is created, leading to performance issues.
+    \item Always use \verb|equals| method to compare wrapper class objects.
+\end{itemize}
+
+\section{5. Exceptions}
+\begin{verbatim}
+try {
+    // do something
+} catch (an exception parameter) {
+    // handle exception
+} catch (another exception parameter) {
+    // can have more catch blocks
+} finally { //optional
+    // is executed regardless of whether an exception occurs
+}
+\end{verbatim}
+\subsection{Throwing Exceptions} 
+\begin{verbatim}
+class Circle {
+    ...
+    public Circle(Point c, double r) 
+                throws IllegalArgumentException {
+        if (r < 0) {
+            throw new IllegalArgumentException("r > n");
+        }
+        this.c = c; this.r = r;
+    }
+}
+\end{verbatim}
+
+\subsection{Checked vs Unchecked Exceptions}
+An \deff{unchecked exception} is an exception caused by programmer's errors e.g. \verb|IllegalArgumentException|, \verb|NullPointerException|, \verb|ClassCastException|.\\
+Unchecked Exceptions are subclasses of \verb|RuntimeException|.
+A \deff{checked exception} is an exception that programmer has no control over and should be anticipated and handled.
+
+\end{multicols}
+\end{document}
