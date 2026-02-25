@@ -99,9 +99,6 @@
 \footnotesize
 %\raggedright
 
-\begin{center}
-\huge\bfseries MA2108S Midterms AY25/26 Sem 2
-\end{center}
 \setlength{\premulticols}{0pt}
 \setlength{\postmulticols}{0pt}
 \setlength{\multicolsep}{1pt}
@@ -112,7 +109,9 @@
 
 
 % -----------------------------------------------------------------------
-
+\begin{center}
+\huge\bfseries MA2108S MT AY25/26
+\end{center}
 \section{1. Pre-requisites}
 % \subsubsection{}
 \thm{Well-Ordering Principle of $\mathbb{N}$} Every non-empty subset $S \in \mathbb{N}$ has a least (smallest) element.
@@ -361,13 +360,13 @@ Tests for infinite series' convergence:
 \begin{itemize}
     \item \deff{$n$-th Term Test} - If $\sum x_n$ converges, then $\lim_{n\to\infty} x_n = 0$.
     
-    \item Cauchy Criterion Test
+    \item \deff{Cauchy Criterion} $\sum_{i=1}^\infty a_i$ is convergent iff $\forall \epsilon > 0, \exists N\in\mathbb{N}$ such that for any $m > n \geq N$, $|a_{n+1}+...+a_m|<\epsilon$
     
     \item \deff{Partial Sum Bounded Test}, for series w. non-negative terms - Suppose $x_n \ge 0, \forall n \in \mathbb{N}$, then $\sum_{x_n}$ converges iff. $(s_n)$ is bounded.
     
-    \item \deff{Comparison Test} - For $(x_n), (y_n)$ with some $K \in \mathbb{N}$, s.t. $n \ge K \implies 0 \le x_n \le y_n$. Then [1] $\sum y_n$ converges $\implies$ $\sum x_n$ converges, and [2] $\sum x_n$ diverges $\implies$ $\sum y_n$ diverges.
+    \item \deff{Comparison Test} - Suppose $\{a_n\}$ and $\{b_n\}$ satisfy that there exists $K\in\mathbb{N}$ and $\lambda>0$ such that for all $n\geq K$, $0\leq a_n \leq \lambda b_n$. Then [1] $\sum_{n=1}^\infty b_n$ convergent $\implies \sum_{n=1}^\infty a_n$ convergent, and [2] $\sum_{n=1}^\infty a_n$ divergent $\implies \sum_{n=1}^\infty b_n$ divergent.
     
-    \item \deff{Limit Comparison Test} - For \textbf{strictly positive} $(x_n), (y_n)$ with limit $r = \lim_{n \to \infty} (\frac{x_n}{y_n})$. Then [1] if $r = 0$, $\sum y_n$ converges $\implies$ $\sum x_n$ converges. [2] if $r > 0$, $\sum y_n$ converges iff $\sum x_n$ converges.
+    \item \deff{Limit Comparison Test} - For \textbf{strictly positive} $(a_n), (b_n)$ with limit $r = \lim_{n \to \infty} (\frac{a_n}{b_n})$. Then [1] if $r = 0$, $\sum b_n$ converges $\implies$ $\sum a_n$ converges, $\sum a_n$ diverges $\implies$ $\sum b_n$ diverges, [2] if $r > 0$, $\sum b_n$ converges iff $\sum a_n$ converges.
 
     \item \deff{Cauchy Condensation Test} - Suppose $\{a_n\}$ decreasing and every term is positive. Define $b_k:=2^ka_{2^k}$. $\sum_{n=1}^\infty a_n$ convergent iff $\sum_{n=1}^\infty b_n$ convergent.
 
