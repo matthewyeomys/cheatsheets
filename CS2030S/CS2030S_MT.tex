@@ -109,7 +109,8 @@
 
 % -----------------------------------------------------------------------
 \begin{center}
-\huge\bfseries CS2030S MT AY25/26
+{\huge\bfseries CS2030S MT AY25/26}\\
+{\large holy cheatsheet}
 \end{center}
 \section{1. Types}
 % \subsubsection{}
@@ -293,8 +294,140 @@ class Circle {
 
 \subsection{Checked vs Unchecked Exceptions}
 An \deff{unchecked exception} is an exception caused by programmer's errors e.g. \verb|IllegalArgumentException|, \verb|NullPointerException|, \verb|ClassCastException|.\\
-Unchecked Exceptions are subclasses of \verb|RuntimeException|.
+Unchecked Exceptions are subclasses of \verb|RuntimeException|.\\
 A \deff{checked exception} is an exception that programmer has no control over and should be anticipated and handled.
+
+\subsection{Overriding Method that throws Exceptions}
+When overriding a method that throws a checked exception, the overriding method must throw only the same or more specific checked exception than the overriden method. (LSP)
+
+\subsection{The Error class}
+Errors are for situations where the program should terminate as generally no way to recover. \verb|Exception| and \verb|Error| <: \verb|Throwable|.
+
+\section{6. Generics}
+Allow classes/methods to be defined without resorting to using the \verb|Object| type.\\
+Generics are invariant in Java.
+
+\subsection{Type Erasure}
+At compile time, type parameters are replaced by \verb|Object| or the bounds (e.g. \verb|? extends Number| is replaced by \verb|Number|) \\
+Given some class \verb|Pair|,
+\begin{verbatim}
+class Pair<S, T> {
+    private S first;        // -> private Object first
+    private T second;       // -> private Object second
+    ...
+    public S getFirst() {   // -> public Object getFirst() {
+        return this.first;  //        return this.first;
+    }                       //    }
+    ...
+}
+
+Integer i = new Pair<Integer, String>(4, "hello").getFirst();
+// becomes
+Integer i = (Integer) new Pair(4, "hello").getFirst();
+\end{verbatim}
+
+\subsection{Implications of Type Erasure}
+\subsubsection{Overloading based on Type Arguments}
+Given some class A, after type erasure we have...
+\begin{verbatim}
+class A{
+    void foo(Pair<String, String> p) {...}
+    // -> void foo(Pair p) {...} 
+    
+    void foo(Pair<Integer, Integer> p) {...}
+    // -> void foo(Pair p) {...}
+}
+\end{verbatim}
+Both methods have the same signature and code will not compile.
+
+\subsubsection{Using Type Parameters in Static Contexts}
+It is necessary for a generic class method to declare its own type parameters.
+\begin{verbatim}
+class D<T> {
+    public static <T> T foo(T x) {...}
+}
+\end{verbatim}
+
+\subsubsection{Generics \& Arrays}
+Generic array \textit{declaration} is fine but generic array \textit{instantiation} is not.
+\begin{verbatim}
+new Pair<S,T>[2]; //illegal
+new T[2]; //illegal
+T[] array; //allowed
+\end{verbatim}
+
+\subsection{Bridge Methods}
+\deff{Bridge Methods} are compiler-generated synthetic methods inserted after type erasure to preserve polymorphism for generics.\\
+Bridge erased method signature expected by the superclass/interface to the more specific method in the subclass. \\
+After erasure, if we have 
+\begin{verbatim}
+class Box {
+    void get(Object o) {...}
+}
+class StringBox extends Box {
+    void get(String s) {...}
+}
+\end{verbatim}
+The compiler requires StringBox to implement a \verb|void get(Object)| method, hence it adds the following bridge method within \verb|StringBox|
+\begin{verbatim}
+void get(Object s) {
+    this.get((String) s);
+}
+\end{verbatim}
+
+\subsection{Unchecked Warnings}
+We cannot instantiate a generic type directly (e.g. \verb|new T[]|), hence we can get around this restriction as follows:
+\begin{verbatim}
+this.array = (T[]) new Object[size];
+\end{verbatim}
+This yields an \deff{unchecked warning}, a message from the compiler that it has done what it can abe because of type erasures, there could be an unpreventable runtime error. \\
+\verb|@SuppressWarnings("unchecked")| cannot apply to an assignment but only to a declaration.\\
+Using raw types can also lead to errors. Raw types only acceptable as an operand of \verb|instanceof|\\
+
+\subsection{Wildcards} 
+
+\begin{itemize}
+    \item \textbf{Upper-Bounded:} \verb|? extends T|
+    \item covariant (if S <: T, then \verb|A<? extends S> <: A<? extends T>|
+    \item \textbf{Lower-Bounded:} \verb|? super T| 
+    \item contravariant (if S <: T, then \verb|A<? super T> <: A<? super S>|
+    \item \textbf{Unbounded:} \verb|?|
+    \item \verb|Array<?>| is the supertype of all generic \verb|Array<T>|
+\end{itemize}
+
+\subsubsection{PECS Principle}
+\textbf{PE} - if need to produce T values, use \verb|List<? extends T>|\\
+\textbf{CS} - if need to consume T values, use \verb|List<? super T>|\\
+if need both, use \verb|?|.
+
+\subsection{Type Inference}
+
+\subsubsection{Diamond Operator}
+only for instantiating a generic type - not as a type
+\begin{verbatim}
+Pair<String, Integer> p = new Pair<>(); 
+//Pair<> is inferred to be CTT(p) = Pair<String, Integer>
+\end{verbatim}
+Given some class
+\begin{verbatim}
+class A{
+    public static <S> boolean 
+            contains(Seq<? extends S> seq, S obj) {...}
+}
+
+A.<Shape>contains(circleSeq, shape);
+//equivalent to
+A.contains(circleSeq, shape);
+\end{verbatim}
+\subsection{Rules for Type Inference}
+\begin{itemize}
+    \item \verb|Type1 <: T <: Type2| then \verb|T| is inferred as \verb|Type1|
+    \item \verb|Type1 <: T| then \verb|T| is inferred as \verb|Type1|
+    \item \verb|T <: Type2|, then \verb|T| is inferred as \verb|Type2| 
+\end{itemize}
+
+
+
 
 \end{multicols}
 \end{document}
