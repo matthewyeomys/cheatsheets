@@ -116,12 +116,12 @@
 % \subsubsection{}
 \thm{Well-Ordering Principle of $\mathbb{N}$} Every non-empty subset $S \in \mathbb{N}$ has a least (smallest) element.
 
-
+\thm{Schröder-Bernstein Theorem} Let A and B be two sets. If $\exists$ injections $f: A\rightarrow B$ and $g: B\rightarrow A$, then there exists bijection $h: A\rightarrow B$
 
 
 
 \section{2. The Real Numbers}
-\subsection{Algebric Properties, \textasciitilde}
+\subsection{Algebraic Properties, \textasciitilde}
 Different types of means 
 \begin{itemize}
     \item \deff{Arithmetic Means} $A_n = \frac{1}{n} \sum_{k=1}^n a_k$
@@ -168,7 +168,7 @@ For a non-empty $S \subseteq \mathbb{R}$, $u$ is the \deff{Supremum} of $S$ if t
     \item $u$ is an upper bound of $S$.
     \item $\forall v \in \mathbb{R}$, if $v$ is an upper bound of $S$, then $v \ge u$.
 \end{enumerate}
-For a non-empty $S \subseteq \mathbb{R}$, $w$ is the \deff{Infinum} of $S$ if the following conditions are met, and we denote it as $\inf S$:
+For a non-empty $S \subseteq \mathbb{R}$, $w$ is the \deff{Infimum} of $S$ if the following conditions are met, and we denote it as $\inf S$:
 \begin{enumerate}
     \item $w$ is a lower bound of $S$.
     \item $\forall v \in \mathbb{R}$, if $v$ is a lower bound of $S$, then $v \le w$.
@@ -176,7 +176,7 @@ For a non-empty $S \subseteq \mathbb{R}$, $w$ is the \deff{Infinum} of $S$ if th
 \underline{Note}: Sup. and Inf. are \textbf{uniquely determined}, if they exist.
 
 
-Alternative Definition (Similarly for Infinum):
+Alternative Definition (Similarly for Infimum):
 
 \thm{Lemma 2.3.4} For $u$ an upper bound of $S \subseteq \mathbb{R}$, $u = \sup S$ iff.
 \[
@@ -198,15 +198,15 @@ For a non-empty $S \subseteq \mathbb{R}$, $u$ is the \deff{Maximum} (\deff{Minim
 
 
 
-\thm{The Archimedeam Property} If $x \in \mathbb{R}$, then $\exists n_x \in \mathbb{N}$ s.t. $x < n_x$.
+\thm{The Archimedean Property} If $x \in \mathbb{R}$, then $\exists n_x \in \mathbb{N}$ s.t. $x < n_x$.
 
 
 
 \thm{Corollary 2.4.6} If $x > 0$, then $\exists n \in \mathbb{N}$ such that $n-1 \le x <  n$.
 
+\thm{Corollary 2.4.7} $\forall x>0, \exists n \in \mathbb{N}$ s.t. $\frac{1}{n} < x$.
 
-
-\thm{Density Theorems} For $x, y \in \mathbb{R}$ with $x < y$, tehre exists $r \in \mathbb{Q}$ ($z \in \mathbb{R} \backslash \mathbb{Q}$) s.t. $x < r < y$ ($x < z < y$).
+\thm{Density Theorems} For $x, y \in \mathbb{R}$ with $x < y$, there exists $r \in \mathbb{Q}$ ($z \in \mathbb{R} \backslash \mathbb{Q}$) s.t. $x < r < y$ ($x < z < y$).
 
 
 % Supremum Property 
@@ -221,7 +221,9 @@ A sequence of intervals $I_n, n \in \mathbb{N}$ is \deff{Nested} if
 \[
 I_1 \supseteq I_2 \supseteq ... \supseteq I_n \supseteq I_{n+1} \supseteq ...
 \]
-\underline{Properties}: [1] If $I_n = [a_n, b_n], n \in \mathbb{N}$ is a nested seq. of closed bounded intervals, then $\exists \xi \in \mathbb{R}$ s.t. $\xi \in I_n, \forall n \in \mathbb{N}$. [2] If $I_n = [a_n, b_n], n \in \mathbb{N}$ satisfying $\inf \{ b_n - a_n: n \in \mathbb{N} \} = 0$, then $\xi$ contained in all $I_n$ is unique.
+\underline{Property}: If $I_n = [a_n, b_n], n \in \mathbb{N}$ satisfying $\inf \{ b_n - a_n: n \in \mathbb{N} \} = 0$, then $x$ contained in all $I_n$ is unique.
+
+\thm{Nested Interval Property} Let $\{I_n=[a_n, b_n]:n\in\mathbb{N}\}$ be a sequence of closed intervals such that for any $n\in\mathbb{N}$, $I_{n+1} \subseteq I_n$. Then there exists $x\in\mathbb{R}$ s.t. $x\in\bigcap_{n=1}^\infty I_n$
 
 
 
