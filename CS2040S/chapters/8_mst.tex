@@ -1,0 +1,60 @@
+\section{MST}
+\paragraph{Properties of MST}
+Suppose a connected graph. Otherwise, no spanning tree exists.
+\begin{itemize}
+  \item MST is a acyclic graph. Tree.
+  \item If an edge is removed from a MST, the two components are MSTs.
+  \item For every \emph{cycle}, the maximum weighted edge is not in the MST.\@
+  \item For every \emph{cut} of the nodes, the minimum weighted edge across the
+    cut is in the MST.\@
+\end{itemize}
+\paragraph{Edge colouring for proof of correctness}
+\textcolor{Bittersweet}{Red Rule}: If $C$ is a cycle with no red arcs, then the max-weighted edge in $C$ is coloured red.
+\textcolor{Blue}{Blue Rule}: If $D$ is a cut with no blue arcs, then the min-weighted edge in $D$ is coloured blue.
+\paragraph{UFDS}
+Weighted Union: To make the smaller tree the subtree of the larger tree
+$\Rightarrow O(\log(n))$ height.\@ \textcolor{Bittersweet}{Runtime}: $O(\log n)$\\
+Path Compression: Shrinks the tree whenever \verb|find| is called.\\
+\textcolor{Bittersweet}{Runtime}: $m$ operations on $n$ objects–$O(n +
+m\alpha(m, n))$
+\begin{verbatim}
+findRoot(int p)
+   root = p;
+   while (parent[root] != root)
+      root = parent[root]
+   while (parent[p] != p)
+      temp = parent[p];
+      parent[p] = root;
+      p = temp;
+   return root;
+\end{verbatim}
+\paragraph{Kruskal's Algorithm}
+\textcolor{Bittersweet}{Runtime}: $O(E\alpha(E)) + O(E\log E)=O(E\log V)$
+\begin{itemize}
+  \item Initialise UFDS for n nodes
+  \item Sort edges by weights
+  \item For each edge $e = (u,v)$:
+    \begin{itemize}
+      \item If $u,v$ are in the same component, skip
+      \item Otherwise, add $e$, and union $u, v$
+    \end{itemize}
+\end{itemize}
+\paragraph{Prim's Algorithm}
+\textcolor{Bittersweet}{Runtime}: $O((E+V)\log V)$. $O(E + V\log V)$ for fibo-heap.\\
+Basic idea:
+\begin{itemize}
+  \item $S$: set of nodes connected by blue edges
+  \item Initially, $S=\{A\}$
+  \item Repeat:
+    \begin{itemize}
+      \item Identify cut: $\{S, V\backslash S\}$
+      \item Find minimum weighted edge on cut
+      \item Add new node to $S$
+    \end{itemize}
+\end{itemize}
+\paragraph{Variants}
+Undirected graphs / Equal weighted edges: DFS / BFS!\\
+DAGs: $\forall v\in V$ add minimum weighted incoming edge–$O(E)$\\
+Edges weighted $\{1..10\}\Rightarrow$ use an array of size 10 to act as PQ\\
+Reweighting: Only relative edge weights matter. Addition, Multiplication
+allowed. To find MaxST, multiply by -1 and run MST.\@

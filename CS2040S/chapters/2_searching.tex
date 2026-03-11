@@ -1,0 +1,40 @@
+\section{Searching}
+\paragraph{Binary Search}
+\textcolor{Blue}{Precondition}: Array is sorted, and of size $n$\\
+\textcolor{Blue}{Postcondition}: If element is in arr, \verb|A[begin]=key|\\
+\textcolor{Blue}{Invariants}: Key is within \verb|A[begin..end]|\\
+\verb|(end-begin)|$\le \frac{n}{2^k}$ after the $k$-th iteration
+\begin{verbatim}
+int search(A, key, n)
+   begin = 0
+   end = n-1
+   while begin < end do:
+      mid = begin + (end - begin)/2
+      if key <= A[mid] then
+         end = mid
+      else begin = mid + 1
+   return (A[begin]==key) ? begin : -1
+\end{verbatim}
+\textcolor{Bittersweet}{Runtime}: $O(\log n)$
+
+\paragraph{Peakfinding}
+\textcolor{Blue}{Precondition}: Array of size $n$\\
+\textcolor{Blue}{Postcondition}: $A[i-1]\le A[i]\wedge A[i+1]\le A[i]$\\
+\textcolor{Blue}{Invariants}: $\exists$ a peak in \verb|A[begin..end]|\\
+Every peak in \verb|A[begin..end]| is a peak in \verb|A[0..n-1]|\\
+Recurse in the right$\Rightarrow$Peak in the right half is a peak in the array.
+\begin{verbatim}
+int findPeak(A, n)
+   if A[n/2] is a peak then return n/2
+   else if A[n/2 + 1] > A[n/2] then
+      return findPeak(A[n/2 + 1..n], n/2)
+   else if A[n/2 - 1] > A[n/2] then
+      return findPeak(A[1..n/2 - 1], n/2)
+\end{verbatim}
+\textcolor{Bittersweet}{Runtime}: $O(\log n)$\ \textcolor{Bittersweet}{Steep peakfinding}: $O(n)$
+
+\paragraph{Quickselect}
+\textcolor{Blue}{Precondition}: Array of size $n$
+\textcolor{Blue}{Postcondition}: Return the k-th smallest element.
+\textcolor{Blue}{Invariants}: The k-th element is on the side that we recurse on.\\
+\textcolor{Bittersweet}{Runtime}: $O(n)$

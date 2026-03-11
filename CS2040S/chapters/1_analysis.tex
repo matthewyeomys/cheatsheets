@@ -1,0 +1,60 @@
+\section{Algorithmic Analysis}
+\paragraph{Asymptotic Notations}
+\textcolor{Blue}{Big-O Notation}\\
+The upper bound for runtime/space.
+\[T(n)\in O(f(n))\iff\]
+\[\exists c, n_0(c>0\wedge n_0>0\wedge\forall n>n_0(T(n)\le cf(n)))\]
+\textcolor{Blue}{Big-$\Omega$ notation}\\
+The lower bound for runtime/space.\\
+\[T(n)\in\Omega(f(n))\iff\]
+\[\exists c, n_0(c>0\wedge n_0>0\wedge\forall n>n_0(T(n)\ge cf(n)))\]
+\textcolor{Bittersweet}{Note:} $f(n)\in O(g(n))\iff g(n)\in\Omega(f(n))$\\
+\textcolor{Blue}{Big-$\Theta$ notation}\\
+The bound for runtime/space.\\
+\[T(n)\in\Theta(f(n))\iff\]
+\[T(n)\in\Omega(f(n))\wedge T(n)\in O(f(n))\]
+\textcolor{Blue}{Comparison}\\
+$O(1)<O(\log(\log(n)))<O(\log(n))<O(\log^{k}n)<O(n)<O(n^k)<O(2^n)<O(2^{2n})<O(n!)$
+\paragraph{Akra-Bazzi Theorem}
+$T(n)=g(n)+\sum\limits_{i=1}^{k}a_{i}T(b_{i}n+h_{i}(n))$, with
+\textcolor{Maroon}{%
+\begin{itemize}
+  \item Sufficient base cases
+  \item $a_{i}>0,0<b_{i}<1$
+  \item $|g'(x)|=O(x^{c}), |h_{i}(x)|=O(\frac{x}{\log^{2} x})$
+\end{itemize}
+}
+Solve for $p:\sum\limits_{i=1}^{k}a_{i}b_{i}^{p}=1$
+\[T(n)=\Theta(n^{p}(1+\int_{1}^{n}\frac{g(u)}{u^{p+1}}du))\]
+\paragraph{Master Theorem}
+$T(n)=aT(n-b)+O(n^{k})$, where \textcolor{Maroon}{$a,b>0, k\ge0$}
+\[T(n)=
+  \begin{cases}
+    O(n^{k}) & a<1 \\
+    O(n^{k+1}) & a=1 \\
+    O(a^{n/b}n^{k}) & a>1
+  \end{cases}\]
+$T(n)=aT(n/b)+\Theta(n^{k}\log^{p}n)$, where\\
+\textcolor{Maroon}{$a\ge1, b>1, k\ge0, p\in\mathbb{R}$}. For $c=\log_{b}a$,
+\[T(n)=
+  \begin{cases}
+    \Theta(n^{k}\log^{p}n) & c < k, p\ge0\\
+    \Theta(n^{k}) & c < k, p<0\\
+    \Theta(n^{c}\log^{p+1}n) & c=k, p>-1\\
+    \Theta(n^{c}\log\log n) & c=k, p=-1\\
+    \Theta(n^{c}) & c=k, p<-1\\
+    \Theta(n^c) & c>k \\
+  \end{cases}\]
+\paragraph{Linear Recurrence}
+$T(n)+c_{1}T(n-1)+\cdots+c_{k}T(n-k) + f(n)$\\
+\textcolor{Blue}{For $f(n)=0$}:
+\[x_n=c_{1}x^{n-1}+\cdots+c_{k}^{n-k}\]
+For $t$ distinct roots of multiplicity $m_i$,
+\[\begin{split}
+  T(n)=&(\alpha_{1,0}+\alpha_{1,1}n+\cdots+\alpha_{1,m_1}n^{m_{1}-1})r_{1}^{n}+\\
+       &\quad\vdots\qquad\quad\vdots\\
+       &(\alpha_{t,0}+\alpha_{t,1}n+\cdots+\alpha_{t,m_t}n^{m_{t}-1})r_{t}^{n}
+\end{split}\]
+\textcolor{Blue}{For $f(n)\neq0$}, find solution $a_h$ for $f(n)=0$:
+\[T(n)=a_p+a_h\]
+Guess $a_p$ similar to $f(n)$: Polynomial of degree $n$, $Anc^n$, $Ac^n$

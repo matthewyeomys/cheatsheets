@@ -1,0 +1,53 @@
+\section{Sorting}
+\textcolor{Bittersweet}{Problem}: Array \verb|A[1..n]| of elements $\Rightarrow$
+Permutation \verb|B[1..n]| st. $B[1]\le B[2]\le\cdots\le B[n]$\\
+\begin{tabular}{c c  c  c }
+  \toprule
+  Algo & Worst case & Best case & Space\\
+  \midrule
+  Bubble & $O(n^2)$ & $O(n)$ & $O(1)$\\
+  Selection & $O(n^2)$ & $\Omega(n^2)$ & $O(1)$\\
+  Insertion & $O(n^2)$ & $O(n)$ & $O(1)$\\
+  Merge & $O(n\log n)$ & $O(n\log n)$ & $O(n)$\\
+  Quick & $O(n^2)$ & $O(n\log n)$ & $O(\log n)$\\
+  Heap & $O(n\log n)$ & $O(n\log n)$ & $O(1)$\\
+  \bottomrule
+\end{tabular}
+%% cite why quick has weird space complexity, and explain wat is best and worst case
+\paragraph{Invariants}
+\textcolor{Blue}{Bubble}: Largest $j$ items sorted in the final $j$ positions
+after the $j$-th iteration
+Bubble sort is stable.\\
+\textcolor{Blue}{Selection}: Smallest $j$ items sorted in the first $j$
+positions after the $j$-th iteration
+Selection sort is non-stable.\\
+\textcolor{Blue}{Insertion}: First $j$ positions are sorted after the $j$-th
+iteration
+Insertion sort is stable.\\
+\textcolor{Blue}{Merge}: $tmp[j]$ is the minimum of all remaining elements
+after the $j$-th iteration
+Mergesort is stable.\\
+\textcolor{Blue}{Quick}: B is partitioned around pivot\\
+\verb|A[high]>pivot| at the end of each iter
+\begin{verbatim}
+void quickSort(arr, n)
+   if (n == 1) then return;
+   else
+      p = partition(arr[1..n], n)
+      quickSort(arr[1..p-1], p-1)
+      quickSort(arr[p+1..n], n-p)
+\end{verbatim}
+Quicksort [$O(n\log n)$ version] is non-stable.\\
+\textcolor{Bittersweet}{Duplicates Paritioning}:
+3 way partitioning: Packing duplicates together!\\
+One pass: \\\\%% figure here
+Two passes: \\\\
+\textcolor{Blue}{Heap}: Largest $j$ items are sorted in the final $j$ positions
+after the $j$-th iteration.
+\begin{verbatim}
+void heapSort(arr, n)
+   for n - 1:
+      1. Swap root with last element
+      2. Bubble down the root node
+\end{verbatim}
+Heapsort is non-stable.

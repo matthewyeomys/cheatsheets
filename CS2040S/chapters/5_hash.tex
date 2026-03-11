@@ -1,0 +1,60 @@
+\section{Hashing}
+\begin{multicols*}{2}
+\begin{verbatim}
+insert(Key k, Value v)
+search(Key k)
+delete(Key k)
+\end{verbatim}
+\begin{verbatim}
+contains(Key k)
+size()
+\end{verbatim}
+\end{multicols*}
+\paragraph{Direct Access Table}
+Using an array indexed by keys to access values. Suppose English words, with
+max. 28 letters, and each letter represented in 5 bits. Any word can then be
+represented in 140 bits. We require a $2^{140}$ sized direct-access array.
+\paragraph{Hash Functions $h:U\mapsto\{1..m\}$}
+Considers the smaller set of actual keys $K$, and map the
+$|K|=n$ keys to $m\approx n$ buckets. By PHP, $\exists h(k_{1})=h(k_{2}) \wedge k_{1}\neq k_{2}$.\\
+\textcolor{Blue}{Simple Uniform Hashing Assumption}: Every key is equally
+likely to map to every bucket, and keys are mapped independently.\\
+Let $X_i=$ numBalls in the $i$-th bucket. $X_{i}\sim Bin(n, \frac{1}{m})$\\
+For fixed load $\alpha$, $E($size of max bucket$)=\Theta(\frac{\log n}{\log \log n})$\\
+\verb|int Object::hashCode()|: Must redefine \verb|equals|. If two objects are
+equal, they have to return the same hash code.\\
+Used: \verb|o.hashCode() ^ (table.size() - 1)|
+\paragraph{Dealing with Hash Collisions}
+\begin{itemize}
+  \item New Hash Function\\
+    ``Better''? Need to copy table, and eventually another collision
+  \item Chaining
+  \item Open Addressing
+\end{itemize}
+\emph{Chaining}: Each bucket contains a linked list\\
+\textcolor{Bittersweet}{Space}: $O(m\text{ buckets} + n\text{ items})$\\
+\textcolor{Bittersweet}{Runtime}: Insert $O(1 + \verb|cost|(h))$ Delete $O(n + \verb|cost|(h))$
+\emph{Open Addressing}: Probing a sequence of buckets until empty found\\
+\textcolor{Bittersweet}{Space}: $O(m)$\ \textcolor{Bittersweet}{Runtime}: Worst case $O(n)$ Practice $O(1)$ for
+constant load factor and good hash functions
+\paragraph{Table Resizing}
+\begin{enumerate}
+  \item Choose new table size $m'$
+  \item Choose new hash function $h'$ such that\\
+    $h:U\mapsto\{1..m\}, h':U\mapsto\{1..m'\}$
+  \item $\forall{x}\in$ currTable, newTable$[h' (x)] = x$
+\end{enumerate}
+Resizing costs $\Theta(m' + m + n)$ for new table size $m'$, current table size $m$, $n$ elements.\\
+Proof: Consider sized $2n$ table of $n$ elements, and a sequence of $n$
+operations. $n$ inserts or deletions are both $\Theta(n)$.
+\paragraph{Cuckoo Hashing}
+\begin{verbatim}
+insert(Key k, Table T, Hash h)
+   slot = h(k)
+   displaced = T[slot]
+   T[slot] = k
+   if (displaced != null) then
+      insert(displaced,
+             T == A ? B : A,
+             T == A ? g : f)
+\end{verbatim}

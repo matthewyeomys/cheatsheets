@@ -1,0 +1,131 @@
+\section{Graphs}
+Graph $G=(V,E)$, where\\
+$|V|>0, E\subset\{ (v,w) : (v\in V), (w\in V) \}$\\
+Solving graph problems: Reduce problem to a graph, where each node
+is a state. Allows for stateless algorithms to run. If possible, use DAG (much
+more efficient) [Phantom nodes, 0-weight edges]
+\paragraph{Graph Representations}
+If space is limited, $|E|<<|V|^{2}$, use adjacency list.\\
+If require matrix operations, use adjacency matrix.\\
+\textcolor{Blue}{Adjacency List} 
+$|V|$-sized array, each element containing a linked list of neighbours\\
+\textcolor{Bittersweet}{Space}: $O(|V|+|E|)$, 
+\textcolor{Bittersweet}{Runtime}:\\
+Iterating neighbours of specified $v$: $O(\deg(v))$\\
+Determine if $x, y$ are neighbours: $O(\min\{\deg(x), \deg(y)\})$
+\textcolor{Blue}{Adjacency Matrix}
+$|V|^{2}$-sized symmetric matrix, $A[v][w]=1\iff (v,w)\in E$.
+$A^{2}$ to find out 2-hop neighbours.\\
+\textcolor{Bittersweet}{Space}: $O(|V|^{2})$, 
+\textcolor{Bittersweet}{Runtime}:\\
+Iterating neighbours of specified $v$: $O(|V|)$\\
+Determine if $x, y$ are neighbours: $O(1)$\\
+\textcolor{Blue}{Edge List}
+$|E|$-sized array of all edges in the graph\\
+\textcolor{Bittersweet}{Space}: $O(|E|)$, 
+\textcolor{Bittersweet}{Runtime}:\\
+Iterating neighbours of specified $v$: $O(|E|)$\\
+Determine if $x, y$ are neighbours: $O(|E|)$
+\paragraph{Searching}
+\textcolor{Blue}{Input}: Source vertex \verb|S|\\
+\textcolor{Blue}{Output}: Visit destination vertex \verb|D|. OR all nodes in the graph.
+\begin{verbatim}
+boolean bfs(source, dest)
+   source.isVisited = true
+   que.offer(source)
+   while (!que.isEmpty())
+      curr = que.poll()
+      for (nbr : curr.nbrList())
+         if (!nbr.isVisited) then
+            nbr.isVisited = true
+            que.offer(nbr)
+            // Set nbr.dist/nbr.parent
+   return dest.isVisited
+\end{verbatim}
+\textcolor{ForestGreen}{DFS} is \emph{exactly the same} with a \verb|stack|\\
+\textcolor{ForestGreen}{BFS \& DFS} is $O(|V| + |E|)$
+\paragraph{Topological Sorting}
+Ordering of nodes: $(u, v)\in E\Rightarrow u$ before $v$ in the toposort.\\
+Post-order DFS:\@ \textcolor{Bittersweet}{Runtime}: $O(|V|+|E|)$\@
+\begin{verbatim}
+void topo(Node[] nodes)
+   for (node : nodes)
+     if (!node.visited) then
+        node.visited = true
+        toposort(node)
+        order.prepend(node)
+void toposort(Node node)
+   for (nbr : node.nbrList())
+      if (!nbr.visited) then
+         nbr.visited = true
+         toposort(node)
+         order.prepend(nbr)
+\end{verbatim}
+\paragraph{Tarjan's Algorithm}
+To find cycles, points which removed disconnects graph (articulation points), strongly
+connected components ($\forall(u,v)\in V^{2}, \exists\ \text{path}(u,v)$)
+\begin{verbatim}
+stk = new Stack<>()
+void tarjan(Node curr, int time)
+   stk.push(curr)
+   curr.time = time
+   lowTime = curr.time
+   for (Node nbr : curr.nbrList())
+      if (nbr.lowTime is set) then continue
+      if (nbr.time is set) then
+         lowTime = min(nbr.time, lowTime)
+      else if (nbr.time is not set) then
+         tarjan(nbr, time + 1)
+         lowTime = min(nbr.lowTime, lowTime)
+   curr.lowTime = lowTime
+   if (lowTime == time) then
+      while (stack.peek() != curr)
+         stack.pop() // SCC rooted at curr
+\end{verbatim}
+$S$ is an articulation point if
+\begin{itemize}
+  \item $S$ is the source and in DFS tree, $S$ has outdegree 2
+  \item $S$ is not the source, and has a neighbour $v$ st. $v.lowTime \ge
+    S.time \vee S.lowTime \ge v.time$
+\end{itemize}
+$\exists v\in V (v.lowTime< v.time)\Rightarrow \exists$ a cycle
+\paragraph{Dijkstra}
+Triangle Inequality for (shortest) distance between Nodes:
+\[\delta(S, C)\le \delta(S, A) + \delta(A, C)\]
+\begin{verbatim}
+void dijkstra()
+   for (node : nodes)
+      pq.insert(node, inf)
+   pq.decreaseKey(source, 0)
+   while (!pq.isEmpty())
+      curr, distance = pq.extractMin()
+      dist[curr] = distance
+      for (nbr : curr.nbrList())
+         if (pq.contains(nbr))
+            relax(nbr,
+                  distance + E[curr, nbr])
+\end{verbatim}
+\textcolor{Bittersweet}{Runtime}: $O(|V|\log|V|+|E|\log|V|)$\\
+Problem Formulation: To ensure that estimates monotonically decrease with
+relaxation with more nodes, and do not decrease further after it is popped from
+the priority queue. $\Rightarrow$ No negative edges
+\paragraph{Bellman Ford}
+\begin{verbatim}
+void bf()
+   // Set up int[] dist
+   for i = 1..|V|-1:
+      for edge (u, v) in E:
+         relax(dist, u, v)
+   for edge (u, v) in E: // +1
+      relax(dist, u, v)
+      // If no change, no negative cycles
+\end{verbatim}
+\textcolor{Bittersweet}{Runtime}: $O(|V||E|)$
+\textcolor{ForestGreen}{Special Case–DAG}:
+\begin{verbatim}
+// Set up int[] dist
+// Get toposorted nodes topoList
+for u in topoList:
+   for neighbour v of u:
+      relax(dist, u, v)
+\end{verbatim}

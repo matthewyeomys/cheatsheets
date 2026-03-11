@@ -1,0 +1,43 @@
+\section{Binary Heap}
+\begin{multicols*}{2}
+\begin{verbatim}
+insert(int pri, Key k)
+extractMax()
+contains(Key k)
+increaseKey(int pri, Key k)
+\end{verbatim}
+\begin{verbatim}
+size(Key k)
+peekMaxId()
+peekMaxPriority()
+\end{verbatim}
+\end{multicols*}
+Consists: indices $\mapsto$ priorities, id $\mapsto$ indices, indices $\mapsto$ id\\
+\textcolor{Blue}{Invariants}: Priority of each node $<$ Priority of parent\\
+Heap is a complete binary tree\\
+\textcolor{Bittersweet}{Runtime}: Mostly $O(\log n)$\\
+\verb|insert|: Set next $=$ ele, while not root and $>$parent: bubbleUp\\
+\verb|increase/decreaseKey|: Change priority and bubble upwards/downwards\\
+\verb|extractMax|: Swap root with last element, remove new last element, bubble downwards
+\paragraph{Building a Heap}
+For parent \verb|x| of two subheaps \verb|L|, \verb|R|. Prove by strong
+induction that if we \verb|bubbleDown(x)|, the resulting heap satisfies
+invariants.
+\begin{verbatim}
+void heapify() {
+  for (int idx = size/2; idx >= 1; idx--) {
+    bubbleDown(idx);
+  }
+}
+\end{verbatim}
+Heapify is $O(n)$:
+\begin{equation*}
+  \begin{split}
+    1\cdot\frac{n}{4} + 2\cdot\frac{n}{8} + \cdots + (h\cdot 1) &= \sum\limits_{k=1}^{h}\frac{kn}{2^{k+1}}=\frac{n}{4}\sum\limits_{k=1}^{h}\frac{k}{2^{k-1}}\\
+    &<\frac{n}{4}\sum\limits_{k=1}^{\infty}\frac{k}{2^{k-1}}\\
+    &=\frac{n}{4}\sum\limits_{k=1}^{\infty}kx^{k-1}, x=1/2\\
+    &=\frac{n}{4}\dfrac{d}{dx}\left[\sum\limits_{k=0}^{\infty}x^{k}\right]\\
+    &=\frac{n}{4}\dfrac{d}{dx}\left[\frac{1}{1-x}\right]=n
+  \end{split}
+\end{equation*}
+%write taylor expansions here%

@@ -1,0 +1,95 @@
+\section{Trees ADT}
+\begin{multicols*}{2}
+\begin{verbatim}
+insert(Key k, Value v)
+search(Key k)
+successor(Key k)
+predecessor(Key k)
+\end{verbatim}
+\begin{verbatim}
+delete(Key k)
+contains(Key k)
+size()
+\end{verbatim}
+\end{multicols*}
+\textcolor{Bittersweet}{Runtime}: Most methods are $O(height)$
+\begin{verbatim}
+K search(K curr, V value)
+   if (value == curr) then
+      return curr
+   else if (value == null) then
+      return null;
+   else if (value > curr.key) then
+      return search(curr.right, value)
+   // Symmetrical on the left
+\end{verbatim}
+\begin{verbatim}
+void insert(K curr, V value)
+   if (value > curr.key) then
+      if (curr.right == null) then
+         curr.right = value
+      else then
+         insert(curr.right, value)
+   // Symmetrical on the left
+\end{verbatim}
+\begin{verbatim}
+K successor(K curr, V value)
+   result = search(curr, value)
+   if (result > value) then return result;
+   else if (result <= value) then
+// Return the right child.
+// If no right child and result is the 
+// left child of parent, return parent.
+// Otherwise recurse until it is a left
+// child.
+\end{verbatim}
+\begin{verbatim}
+void delete(K curr, V value)
+   result = search(curr, value)
+   if (result.hasNoChildren()) then
+      result.delete()
+   else if (result.hasOneChild()) then
+      result.parent.setChild(result.child)
+   else if (result.hasTwoChildren()) then
+      s = successor(result) // MAX 1 child
+      swap(s, result)
+      delete(result, result)
+\end{verbatim}
+\paragraph{Balanced Property}
+BST is balanced if $h\in O(\log n)$
+\begin{enumerate}
+  \item Define a ``good property'' of a tree
+  \item Prove that the ``good property'' $\Rightarrow$ balanced tree\\
+    Height balanced \verb|BST| with height $h$ has at least $n>2^{h/2}$ nodes
+    $\equiv$ $n$ nodes has height $h<2\log n$
+  \item After every operation, reestablish property as invariant
+\end{enumerate}
+\textcolor{ForestGreen}{AVL Tree}:
+$|\verb|v.left.height|-\verb|v.right.height||\le1$\\
+\verb|BST| is height balanced $\iff\forall \verb|v|\in$\verb|BST|, \verb|v| is height balanced
+Proof: $n_{h}\ge 1+n_{h-1}+n_{h-2}\Rightarrow n_{h}\ge2^{h/2}$
+Maintain balance: If \verb|v| is left-heavy:
+\begin{enumerate}
+  \item \verb|v.left| is balanced: \verb|rightRotate(v)|
+  \item \verb|v.left| is left-heavy: \verb|rightRotate(v)|
+  \item \verb|v.left| is right-heavy: \verb|leftRotate(v.left)| + \verb|right-rotate(v)|
+\end{enumerate}
+\textcolor{Bittersweet}{Note}: Case 1 does not decrease root height. Only
+results from deletion, so no need to further decrease root height. Requires up
+to $O(\log n)$ rotations\\
+\textcolor{ForestGreen}{$(a,b)$-Tree}: $2\le a\le (b+1)/2$\\
+\begin{center}
+\vspace{-3mm}
+\begin{tabular}{c  c  c  c  c}
+  \multirow{2}{*}{\textbf{Node type}} & \multicolumn{2}{c}{\textbf{\#Keys}} & \multicolumn{2}{c}{\textbf{\#Children}}\\
+                             & Min & Max & Min & Max\\\midrule
+  Root & $1$ & $b-1$ & $2$ & $b$\\
+  Internal & $a-1$ & $b-1$ & $a$ & $b$\\
+  Leaf & $a-1$ & $b-1$ & $0$ & $0$
+\end{tabular}\\
+\end{center}
+A non-leaf node must have one more child than its number of keys. The keys
+specify the range each child falls under.\\
+All leaf nodes must be at the same depth.\\
+\verb|merge, share, split|\\
+\textcolor{ForestGreen}{Order Statistics Tree}: AVL Tree, storing subtree weight
