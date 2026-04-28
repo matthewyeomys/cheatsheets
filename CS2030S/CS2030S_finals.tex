@@ -3,10 +3,10 @@
 % Modified By Matthew Yeo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[10pt,landscape,letterpaper]{article}
+\documentclass[11pt,portrait,letterpaper]{article}
 \usepackage{amssymb,amsmath,amsthm,physics,bbm}
 \usepackage{multicol,multirow,spverbatim,graphicx,ifthen}
-\usepackage[landscape]{geometry}
+\usepackage[portrait]{geometry}
 \usepackage[colorlinks=true,urlcolor=olgreen]{hyperref}
 \usepackage{booktabs,fontspec,unicode-math,listings,minted,microtype,ulem,empheq}
 \setmainfont[Ligatures=TeX]{TeX Gyre Pagella}
@@ -50,15 +50,15 @@
 \newcommand{\citeqn}[1]{\underline{\textit{#1}}}
 \newcommand{\thm}[1]{\color{theoremRed}{\uline{{\textbf{#1}}}}\color{black}}
 
-\footnotesize
 \setlength{\premulticols}{0pt}
 \setlength{\postmulticols}{0pt}
 \setlength{\multicolsep}{1pt}
 \setlength{\columnsep}{1.8em}
-\begin{multicols}{3}
+\begin{multicols}{2}
 
 \begin{center}
 {\huge\bfseries CS2030S MT AY25/26}\\
+{\large holy cheatsheet}
 \end{center}
 
 % -----------------------------------------------------------------------
@@ -381,7 +381,7 @@ Let \verb|m| be a monad, \verb|f|, \verb|g| return \verb|M<T>|:
 \begin{itemize}
     \item \textbf{Left identity}: \verb|M.of(x).flatMap(f)| $\equiv$ \verb|f.apply(x)|
     \item \textbf{Right identity}: \verb|m.flatMap(M::of)| $\equiv$ \verb|m|
-    \item \textbf{Associativity}: \verb|m.flatMap(f).flatMap(g)| $\equiv$\\ \verb|m.flatMap(x -> f.apply(x).flatMap(g))|
+    \item \textbf{Associativity}: \verb|m.flatMap(f).flatMap(g)| $\equiv$ \verb|m.flatMap(x -> f.apply(x).flatMap(g))|
 \end{itemize}
 A \deff{Functor} only requires \verb|map|. All monads are functors; not all functors are monads.
 
