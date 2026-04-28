@@ -1,0 +1,420 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Original Source: Dave Richeson (divisbyzero.com), Dickinson College
+% Modified By Matthew Yeo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt,landscape,letterpaper]{article}
+\usepackage{amssymb,amsmath,amsthm,physics,bbm}
+\usepackage{multicol,multirow,spverbatim,graphicx,ifthen}
+\usepackage[landscape]{geometry}
+\usepackage[colorlinks=true,urlcolor=olgreen]{hyperref}
+\usepackage{booktabs,fontspec,unicode-math,listings,minted,microtype,ulem,empheq}
+\setmainfont[Ligatures=TeX]{TeX Gyre Pagella}
+\setsansfont{Fira Sans}
+\setmonofont{Inconsolata}
+\setmathfont{TeX Gyre Pagella Math}
+
+\def\MT@is@uni@comp#1\iffontchar#2\else#3\fi\relax{%
+  \ifx\\#2\\\else\edef\MT@char{\iffontchar#2\fi}\fi
+}
+\makeatother
+
+\ifthenelse{\lengthtest{\paperwidth = 11in}}
+    {\geometry{margin=0.4in}}
+    {\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm}}
+\pagestyle{empty}
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}{-1ex plus -.5ex minus -.2ex}{0.5ex plus .2ex}{\sffamily\large}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}{-1ex plus -.5ex minus -.2ex}{0.5ex plus .2ex}{\sffamily\normalsize\itshape}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}{-1ex plus -.5ex minus -.2ex}{1ex plus .2ex}{\normalfont\small\itshape}}
+\makeatother
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+\usepackage{academicons}
+
+\begin{document}
+
+\definecolor{mathBlue}{cmyk}{1,.72,0,.38}
+\definecolor{defOrange}{cmyk}{0,0.5,1,0.3}
+\definecolor{codeInlineRed}{cmyk}{0,0.9,0.9,0.45}
+\definecolor{theoremRed}{cmyk}{0,0.9,0.9,0.45}
+
+\everymath{\color{mathBlue}}
+\everydisplay{\color{mathBlue}}
+
+\newcommand{\vect}[1]{\pmb{#1}}
+\newcommand{\deff}[1]{\textcolor{defOrange}{\textbf{#1}}}
+\newcommand{\codein}[1]{\textcolor{codeInlineRed}{\texttt{#1}}}
+\newcommand{\citeqn}[1]{\underline{\textit{#1}}}
+\newcommand{\thm}[1]{\color{theoremRed}{\uline{{\textbf{#1}}}}\color{black}}
+
+\footnotesize
+\setlength{\premulticols}{0pt}
+\setlength{\postmulticols}{0pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{1.8em}
+\begin{multicols}{3}
+
+\begin{center}
+{\huge\bfseries CS2030S MT AY25/26}\\
+\end{center}
+
+% -----------------------------------------------------------------------
+\section{1. Types}
+S <: T if code written for T works safely on S. Subtyping is \deff{Reflexive} (S <: S) and \deff{Transitive} (S <: T, T <: U $\Rightarrow$ S <: U).
+
+\subsection{Primitive Types}
+\verb|byte| <: \verb|short| <: \verb|int| <: \verb|long| <: \verb|float| <: \verb|double|; \quad \verb|char| <: \verb|int|
+
+\subsection{Reference Types}
+All non-primitive types are \deff{reference types}. Declared-but-uninitialized variables (e.g.\ \verb|Circle c1;|) are \verb|null|.
+
+\subsection{Liskov Substitution Principle}
+If S <: T: any property of T holds for S; T can be replaced by S without breaking the program. \textbf{VIOLATION}: subclass changes superclass behaviour so a property no longer holds.
+
+\subsubsection{Preventing Inheritance/Overriding}
+\verb|final| on a \textbf{class}: prevents inheritance; on a \textbf{method}: prevents overriding; on a \textbf{field}: prevents reassignment.
+
+\subsection{Casting}
+Only type-cast explicitly when provably safe.
+
+\subsection{Variance}
+For complex type C(T): \textbf{covariant} if S <: T $\Rightarrow$ C(S) <: C(T); \textbf{contravariant} if S <: T $\Rightarrow$ C(T) <: C(S); \textbf{invariant} otherwise. Java arrays are covariant (S[] <: T[] when S <: T).
+
+% -----------------------------------------------------------------------
+\section{2. OOP Principles}
+\subsection{Encapsulation}
+\deff{Encapsulation}: bundling data + methods to maintain an abstraction barrier. Class keeps its own state consistent; clients use methods, not internals.
+
+\subsection{Information Hiding}
+\deff{Information hiding}: enforces the barrier—clients use only the public interface. Direct field access leaks representation; constructors are the safe way to create valid objects.
+
+\subsection{Tell, Don't Ask}
+Tell objects what to do; don't ask for data and do logic in the client. Overusing getters/setters weakens encapsulation, increases coupling, and leaks implementation details.
+
+\subsection{Inheritance}
+Use inheritance for IS-A; composition for HAS-A. Must preserve subtyping semantics.
+
+\subsection{Method Overriding}
+\deff{Overriding}: subclass defines instance method with same descriptor (signature + return type). Uses \textbf{dynamic binding}. Use \verb|@Override| for compiler checking.
+
+\subsection{Method Overloading}
+\deff{Overloading}: same name, different parameter list. Resolved at \textbf{compile time} based on argument CTT. Changing only parameter names or return type $\neq$ overloading.
+
+\subsection{Polymorphism \& Dynamic Binding}
+\deff{Dynamic Binding} — 2 steps:
+\begin{enumerate}
+    \item \textbf{Compile time}: Use CTT(target) to find most specific applicable method descriptor.
+    \item \textbf{Run time}: Use RTT(target) to search up class hierarchy for matching descriptor.
+\end{enumerate}
+\textbf{Class methods}: resolved statically at compile time; RTT ignored.
+
+% -----------------------------------------------------------------------
+\section{3. Abstract Class \& Interface}
+\subsection{Abstract Classes}
+Too general to instantiate. May have fields, concrete methods, and abstract methods. Any class with $\geq 1$ abstract method \emph{must} be declared abstract; abstract class \emph{need not} have any.
+\begin{verbatim}
+abstract class Shape {
+    private int numOfAxesOfSymmetry;
+    public boolean isSymmetric() {
+        return numOfAxesOfSymmetry > 0; }
+    abstract public double getArea();
+}
+\end{verbatim}
+
+\subsection{Interface}
+\deff{Interface}: models behaviour/capability. Methods default to \verb|public abstract|; overrides must be \verb|public|. A class can implement multiple interfaces; interfaces can extend other interfaces.
+\begin{verbatim}
+interface I {...}  class A {...}  class B implements I {...}
+I i; A a; B b;
+i = b;    // OK: B <: I
+b = i;    // ERR: I </: B
+i = a;    // ERR: A </: I
+(I) a;    // compiles: subtype of A could implement I
+\end{verbatim}
+
+% -----------------------------------------------------------------------
+\section{4. Wrapper Class}
+\subsection{Auto-boxing \& Unboxing}
+\verb|Integer i = 4;| (boxing) \quad \verb|int j = i;| (unboxing)\\
+Wrapper objects are \textbf{immutable}—updates create new objects (performance cost). Always use \verb|equals| to compare.
+
+% -----------------------------------------------------------------------
+\section{5. Exceptions}
+\begin{verbatim}
+try { ... }
+catch (ExType e) { ... }   // multiple catch blocks allowed
+finally { ... }            // optional; always runs
+\end{verbatim}
+\begin{verbatim}
+public Circle(Point c, double r)
+        throws IllegalArgumentException {
+    if (r < 0) throw new IllegalArgumentException("r>0");
+    this.c = c; this.r = r;
+}
+\end{verbatim}
+
+\subsection{Checked vs Unchecked}
+\deff{Unchecked}: programmer errors (\verb|IllegalArgumentException|, \verb|NullPointerException|, \verb|ClassCastException|)—subclasses of \verb|RuntimeException|.\\
+\deff{Checked}: anticipated external failures the programmer must handle.
+
+\subsection{Overriding with Exceptions}
+Overriding method may only throw the \textbf{same or more specific} checked exception (LSP).
+
+\subsection{Error}
+\verb|Error|: unrecoverable; program should terminate. \verb|Exception|, \verb|Error| <: \verb|Throwable|.
+
+% -----------------------------------------------------------------------
+\section{6. Generics}
+Define classes/methods without resorting to \verb|Object|. Generics are \textbf{invariant} in Java.
+
+\subsection{Type Erasure}
+Type parameters are replaced at compile time by \verb|Object| (or their bound, e.g.\ \verb|? extends Number| $\to$ \verb|Number|).
+\begin{verbatim}
+class Pair<S,T> {
+    private S first;          // -> Object first
+    private T second;         // -> Object second
+    public S getFirst() {...} // -> Object getFirst()
+}
+Integer i = (Integer) new Pair(4,"hello").getFirst();
+\end{verbatim}
+
+\subsection{Implications of Type Erasure}
+
+\subsubsection{Overloading on Type Arguments}
+\begin{verbatim}
+void foo(Pair<String,String> p) {...}
+void foo(Pair<Integer,Integer> p) {...}
+// both erase to void foo(Pair p) -> compile error
+\end{verbatim}
+
+\subsubsection{Static Context}
+Generic class methods must declare own type parameters:
+\begin{verbatim}
+class D<T> { public static <T> T foo(T x) {...} }
+\end{verbatim}
+
+\subsubsection{Generics \& Arrays}
+\begin{verbatim}
+new Pair<S,T>[2]; // illegal   new T[2];  // illegal
+T[] array;        // allowed (declaration only)
+\end{verbatim}
+
+\subsection{Bridge Methods}
+Compiler-generated synthetic methods to preserve polymorphism after erasure. Bridges the erased superclass/interface signature to the specific subclass method.
+\begin{verbatim}
+class StringBox extends Box {
+    void get(String s) {...}
+    void get(Object s) { this.get((String) s); } // bridge
+}
+\end{verbatim}
+
+\subsection{Unchecked Warnings}
+Workaround for generic arrays: \verb|(T[]) new Object[size]|. Suppress with \verb|@SuppressWarnings("unchecked")| on the \emph{declaration} (not the assignment). Raw types acceptable only as \verb|instanceof| operand.
+
+\subsection{Wildcards}
+\begin{itemize}
+    \item \textbf{Upper-Bounded} \verb|? extends T|: covariant — S <: T $\Rightarrow$ A\verb|<? extends S>| <: A\verb|<? extends T>|
+    \item \textbf{Lower-Bounded} \verb|? super T|: contravariant — S <: T $\Rightarrow$ A\verb|<? super T>| <: A\verb|<? super S>|
+    \item \textbf{Unbounded} \verb|?|: A\verb|<?>| is supertype of all A\verb|<T>|
+\end{itemize}
+\textbf{PECS}: \textbf{PE} — produce $\to$ \verb|List<? extends T>|; \textbf{CS} — consume $\to$ \verb|List<? super T>|; both $\to$ \verb|?|.
+
+\subsection{Type Inference}
+\textbf{Diamond}: \verb|Pair<String,Integer> p = new Pair<>();| infers from CTT of \verb|p|.\\
+\verb|A.<Shape>contains(circleSeq, shape)| $\equiv$ \verb|A.contains(circleSeq, shape)|.\\
+\textbf{Rules}: \verb|Type1 <: T <: Type2| $\Rightarrow$ \verb|Type1|; \quad \verb|Type1 <: T| $\Rightarrow$ \verb|Type1|; \quad \verb|T <: Type2| $\Rightarrow$ \verb|Type2|.
+
+% -----------------------------------------------------------------------
+\section{7. Immutability}
+\deff{Immutable}: observable state never changes after creation. Updates return \textit{new} objects (\deff{copy-on-write}).\\
+\textbf{Benefits}: easier reasoning; safe sharing of objects and internals without defensive copies; inherently thread-safe.\\
+\textbf{How to make immutable}: declare class \verb|final|, make all fields \verb|final|, ensure all field types are also immutable.\\
+\textbf{final $\neq$ immutable}: \verb|final| prevents reassignment but not mutation through the reference — a \verb|final Point c| can still be moved if \verb|Point| is mutable. True immutability requires all fields to themselves be immutable (or deep-copied on in/out).
+
+% -----------------------------------------------------------------------
+\section{8. Nested Classes}
+Defined inside an enclosing class to hide helpers within the abstraction barrier.
+\begin{center}
+{\small\begin{tabular}{lll}
+\toprule
+Kind & Outer access & Instantiate\\
+\midrule
+Static nested & static members only & \verb|new A.C()|\\
+Inner (non-static) & all members of outer & \verb|a.new B()|\\
+Local & eff.\ final vars in method & inside method\\
+Anonymous & same as local & \verb|new I(){...}|\\
+\bottomrule
+\end{tabular}}
+\end{center}
+Inner class carries implicit ref to enclosing instance. Use \deff{qualified this} (\verb|A.this.x|) to access outer fields.
+
+\subsection{Variable Capture}
+Local/anonymous classes \textit{copy} local variables from the enclosing method. Captured vars must be \deff{effectively final} (assigned exactly once) to avoid ambiguity. Reference types can circumvent this via mutation (use with caution).
+
+\subsection{Anonymous Class}
+\verb|new X(args) { body }|. Cannot have a constructor; cannot extend a class AND implement an interface simultaneously; cannot implement $>1$ interface. Commonly replaced by lambdas (Java 8+) unless state or multiple methods are needed.
+\begin{verbatim}
+names.sort(new Comparator<String>() {
+    public int compare(String s1, String s2) {
+        return s1.length() - s2.length(); }
+});
+\end{verbatim}
+
+% -----------------------------------------------------------------------
+\section{9. Functional-Style Programming}
+\subsection{Pure Functions}
+\deff{Pure function}: deterministic (same input $\to$ same output always) and no side effects (no printing, exceptions, field mutation, or argument modification). Enables \deff{referential transparency}: $f(x)$ can be freely replaced by its result.
+
+\subsection{Functional Interface \& Lambda}
+A \deff{functional interface} has exactly one abstract method; annotate with \verb|@FunctionalInterface|.\\
+\textbf{Lambda}: \verb|(T x) -> expr| or \verb|(T x) -> { return expr; }|. Types and \verb|return| omitted when inferable; parens omitted for single parameter.
+\begin{verbatim}
+Transformer<Integer,Integer> sq = x -> x * x;
+Comparator<String> cmp = (a,b) -> a.length()-b.length();
+\end{verbatim}
+
+\subsection{Method Reference (\texttt{::})}
+Reuse an existing method as a first-class value:
+\begin{verbatim}
+Box::of        // x -> Box.of(x)     (static method)
+Box::new       // x -> new Box(x)    (constructor)
+obj::method    // x -> obj.method(x) (bound instance)
+A::foo         // (x,y)->x.foo(y) or A.foo(x,y)
+\end{verbatim}
+Unlike lambdas, method references do \textbf{not} capture the surrounding environment (bound to instance at assignment time).
+
+\subsection{Currying \& Closures}
+\deff{Currying}: transform an $n$-ary function into a chain of $n$ unary functions, enabling partial application.
+\begin{verbatim}
+Transformer<Integer,Transformer<Integer,Integer>> add
+    = x -> y -> x + y;
+Transformer<Integer,Integer> incr = add.transform(1);
+incr.transform(5); // 6
+\end{verbatim}
+\deff{Closure}: lambda + captured environment stored together. Captured vars must be effectively final.
+
+% -----------------------------------------------------------------------
+\section{10. Box \& Maybe}
+\subsection{Box\texttt{<T>}}
+Generic container; client passes lambdas to operate on hidden state without getters/setters:
+\begin{verbatim}
+<U> Box<U> map(Transformer<? super T, ? extends U> f)
+Box<T> filter(BooleanCondition<? super T> cond)
+\end{verbatim}
+Lambda acts as a "cross-barrier manipulator" — operates on internal state without leaking it.
+
+\subsection{Maybe\texttt{<T>} (Option Type)}
+\deff{Maybe<T>} wraps a value that is either \texttt{Some<T>} or \texttt{None} (Java: \verb|Optional<T>|).
+\begin{itemize}
+    \item Restores purity: \verb|findCounter()| returns \verb|Maybe<Counter>| instead of \verb|null|, keeping return type within codomain.
+    \item \verb|map|/\verb|filter| on \texttt{None} are no-ops — absence propagates automatically, eliminating \verb|null| checks and \verb|NullPointerException|.
+\end{itemize}
+
+% -----------------------------------------------------------------------
+\section{11. Lazy Evaluation}
+Java is \deff{eager} by default (expressions evaluated immediately). \deff{Lazy evaluation} delays computation until needed.\\
+Wrap in a no-arg lambda (\verb|Producer<T>| / \verb|Supplier<T>|) to defer:
+\begin{verbatim}
+Producer<String> s = () -> expensiveComputation();
+// computation only runs when s.produce() is called
+\end{verbatim}
+\subsection{Memoization}
+\verb|Lazy<T>|: stores a \verb|Producer<T>|; evaluates on first \verb|get()| and caches. Safe only if producer is pure.
+\begin{verbatim}
+Lazy<Integer> v = Lazy.of(() -> 1 + 1);
+v.get(); // evaluates once, caches 2; subsequent calls return 2
+\end{verbatim}
+
+% -----------------------------------------------------------------------
+\section{12. Java Streams}
+Java's \verb|Stream<T>| $\approx$ lazy \verb|InfiniteList<T>| with richer API.
+\subsection{Functional Interface Mapping}
+\begin{center}
+{\small\begin{tabular}{ll}
+\toprule
+CS2030S & \verb|java.util.function|\\
+\midrule
+\verb|BooleanCondition<T>| & \verb|Predicate<T>::test|\\
+\verb|Producer<T>| & \verb|Supplier<T>::get|\\
+\verb|Consumer<T>| & \verb|Consumer<T>::accept|\\
+\verb|Transformer<T,R>| & \verb|Function<T,R>::apply|\\
+\verb|Transformer<T,T>| & \verb|UnaryOperator<T>::apply|\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\subsection{Building a Stream}
+\begin{verbatim}
+Stream.of(1,2,3)              // finite, from values
+Stream.iterate(1, x -> x+1)  // infinite: 1,2,3,...
+Stream.generate(Math::random) // infinite supply
+list.stream()                 // from a Collection
+\end{verbatim}
+
+\subsection{Operations}
+\textbf{Intermediate} (lazy, return \verb|Stream|): \verb|map|, \verb|filter|, \verb|flatMap|, \verb|limit(n)|, \verb|takeWhile|, \verb|peek|, \verb|distinct|, \verb|sorted|\\
+\textbf{Terminal} (eager, trigger execution): \verb|forEach|, \verb|reduce|, \verb|collect|, \verb|count|, \verb|findFirst|, \verb|anyMatch|, \verb|allMatch|, \verb|noneMatch|\\
+\textbf{Caution}: streams are \textbf{consumed once}; stateful/unbounded ops (e.g.\ \verb|sorted|) are \textbf{unsafe on infinite streams}.
+
+% -----------------------------------------------------------------------
+\section{13. Monad}
+A \deff{Monad} has \verb|of| (wrap a value) and \verb|flatMap| (chain computations carrying side information) satisfying three laws.
+
+\begin{center}
+{\small\begin{tabular}{ll}
+\toprule
+Container & Side-information\\
+\midrule
+\verb|Maybe<T>| & value present or absent\\
+\verb|Lazy<T>| & evaluated or not\\
+\verb|Loggable<T>| & accumulated log\\
+\verb|Stream<T>| & sequence of elements\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\subsection{Monad Laws}
+Let \verb|m| be a monad, \verb|f|, \verb|g| return \verb|M<T>|:
+\begin{itemize}
+    \item \textbf{Left identity}: \verb|M.of(x).flatMap(f)| $\equiv$ \verb|f.apply(x)|
+    \item \textbf{Right identity}: \verb|m.flatMap(M::of)| $\equiv$ \verb|m|
+    \item \textbf{Associativity}: \verb|m.flatMap(f).flatMap(g)| $\equiv$\\ \verb|m.flatMap(x -> f.apply(x).flatMap(g))|
+\end{itemize}
+A \deff{Functor} only requires \verb|map|. All monads are functors; not all functors are monads.
+
+% -----------------------------------------------------------------------
+\section{14. Concurrency \& Parallelism}
+\deff{Concurrency}: OS time-slices tasks to give illusion of simultaneous execution.\\
+\deff{Parallelism}: truly simultaneous execution on multiple cores. All parallel programs are concurrent; not vice versa.
+
+\subsection{Parallel Streams}
+\begin{verbatim}
+stream.parallel().map(...).reduce(...);
+\end{verbatim}
+Safe to parallelize only if lambda is: (1) \textbf{interference-free} (doesn't modify the source), (2) \textbf{stateless}, (3) \textbf{side-effect-free}, (4) \textbf{associative} (for \verb|reduce|). Unordered sources (\verb|HashSet|) parallelize better than ordered ones.
+
+\subsection{Threads (Ch 38)}
+\verb|Thread| wraps a \verb|Runnable| (\verb|void run()|):
+\begin{verbatim}
+new Thread(() -> { /* task A */ }).start(); // async
+new Thread(() -> { /* task B */ }).start(); // async
+\end{verbatim}
+\verb|start()| returns \textbf{immediately} (non-blocking); OS scheduler decides interleaving. Threads communicate via shared variables (error-prone).
+
+\subsection{CompletableFuture (Ch 39)}
+Higher-level async abstraction; a monad over async computations. Expresses task dependencies without manual thread management.
+\begin{verbatim}
+CompletableFuture.supplyAsync(() -> taskA())
+    .thenApply(a -> taskB(a))      // sync, same thread
+    .thenApplyAsync(b -> taskC(b)) // async, new thread
+    .thenCombine(cf2, (b,c)->b+c)  // join two CFs
+    .exceptionally(e -> fallback())// handle exception
+    .get();                        // block for result
+\end{verbatim}
+\verb|thenApply| runs in the completing thread; \verb|thenApplyAsync| dispatches to a new thread. \verb|get()| blocks until result is ready.
+
+\end{multicols}
+\end{document}
