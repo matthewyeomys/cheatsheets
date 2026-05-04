@@ -547,20 +547,6 @@ i.e. Uniformly continuous functions preserve Cauchy sequences.
 
 
 
-
-
-
-\subsection{Jumps}
-\thm{Theorem 5.6.1} For interval $I \subseteq \mathbb{R}$ and increasing function $f: I \to \mathbb{R}$, $c \in I$ not an endpoint, then
-\begin{itemize}
-    \item $\lim_{x \to c^-} f(x) = \sup\{ f(x): x \in I, x < c \}$
-    \item $\lim_{x \to c^+} f(x) = \inf\{ f(x): x \in I, x > c \}$
-\end{itemize}
-
-\deff{Jump} of $f$ at $c$ is defined as $$j_f (c) = \lim_{x \to c^+} f(x) - \lim_{x \to c^-} f(x)$$, and at endpoints, $j_f(a) = \lim_{x \to a^+} f(x) - f(a)$ and so on for $b$.
-
-
-
 \thm{Theorem 5.6.4} For interval $I \subseteq \mathbb{R}$ and $f: I \to \mathbb{R}$ monotone on $I$, the set of points $D \subseteq I$ at which $f$ is discontinuous is a countable set.
 
 
@@ -666,12 +652,201 @@ A subset $U \subseteq S$ is \deff{Disconnected} iff. $U$ has an open cover $\{ A
 
 \thm{Intermediate Value Theorem} For $f: S \to \mathbb{R}$ continuous, if $E$ is connected then $f(E)$ is connected.
 
+\subsection{Completeness}
+
+For a metric space $(S, d)$, a sequence $(x_n)$ in $S$ is \deff{Cauchy} if
+$\forall \epsilon > 0, \exists N \in \mathbb{N}$ s.t. $m, n \geq N \implies d(x_m, x_n) < \epsilon$.
+
+$(S, d)$ is \deff{Complete} if every Cauchy sequence in $S$ converges to a point in $S$.
+\\
+\underline{Examples}: $(\mathbb{R}, |\cdot|)$ is complete. $((0,1), |\cdot|)$ is \textbf{not} complete (e.g. $x_n = 1/n$ is Cauchy but $\to 0 \notin (0,1)$).
+
+\smallbreak
+
+\textbf{Completion} of $(X, d)$: Define $X^* = \{P = \{p_n\} : \{p_n\} \subseteq X \text{ Cauchy}\}$ with metric $D(P, Q) = \lim_{n \to \infty} d(p_n, q_n)$, and $P = Q$ iff $D(P,Q) = 0$.
+Then $(X^*, D)$ is a complete metric space.
+\\
+\underline{Examples}: The completion of $(\mathbb{Q}, |\cdot|)$ is $(\mathbb{R}, |\cdot|)$.
+
+\smallbreak
+
+\thm{Proposition} If $(S, d)$ is a compact metric space, then there exists a countable set $E \subseteq S$ that is \deff{Dense} in $S$ (i.e. $\overline{E} = S$, meaning every open ball in $S$ contains a point of $E$).
+\\
+\underline{Proof sketch}: For each $n \in \mathbb{N}$, take a finite cover of $S$ by balls of radius $1/n$; collect all the centres. Their union over all $n$ is countable and dense. $\square$
 
 
-\noindent\rule{8cm}{0.4pt}
+\section{6. Sequences \& Series of Functions}
+
+\subsection{Pointwise vs Uniform Convergence}
+
+For a sequence of functions $f_n: A \to \mathbb{R}$ and $f: A \to \mathbb{R}$:
+
+$f_n$ \deff{Converges Pointwise} to $f$ on $A$ if
+\[
+\forall x \in A,\ \lim_{n \to \infty} f_n(x) = f(x)
+\]
+i.e. $\forall x \in A, \forall \epsilon > 0, \exists N = N(\epsilon, x)$ s.t. $n \geq N \implies |f_n(x) - f(x)| < \epsilon$.
+
+\smallbreak
+
+$f_n$ \deff{Converges Uniformly} to $f$ on $A$ if
+\[
+\forall \epsilon > 0,\ \exists N = N(\epsilon)\ \text{s.t.}\ n \geq N \implies \sup_{x \in A} |f_n(x) - f(x)| < \epsilon
+\]
+i.e. the same $N$ works for \textbf{all} $x \in A$ simultaneously.
+\\
+\underline{Key distinction}: Pointwise allows $N$ to depend on $x$; uniform does not.
+\\
+\underline{Non-uniform test}: $f_n \not\to f$ uniformly iff $\limsup_{n \to \infty} \sup_{x \in A} |f_n(x) - f(x)| > 0$.
+
+\smallbreak
+
+\textbf{Sequential Criterion for Uniform Convergence}:
+$f_n \to f$ uniformly iff for every sequence $(x_n)$ in $A$,
+\[
+\lim_{n \to \infty} |f_n(x_n) - f(x_n)| = 0
+\]
+
+\subsection{Properties Preserved Under Uniform Convergence}
+
+\thm{Theorem 8.2.2} (Continuity) If each $f_n$ is continuous on $A$ and $f_n \to f$ uniformly on $A$, then $f$ is continuous on $A$.
+\\
+
+\underline{Note}: Pointwise convergence alone does \textbf{not} preserve continuity. Classic counterexample: $f_n(x) = x^n$ on $[0,1]$ converges pointwise to $f(x) = \mathbf{1}_{x=1}$, which is discontinuous.
+
+\thm{Theorem 8.2.4} (Integration) If each $f_n$ is Riemann integrable on $[a, b]$ and $f_n \to f$ uniformly, then $f$ is Riemann integrable and
+\[
+\lim_{n \to \infty} \int_a^b f_n = \int_a^b f = \int_a^b \lim_{n \to \infty} f_n
+\]
+i.e. uniform convergence lets you swap limit and integral.
+
+\thm{Theorem 8.2.5} (Differentiation) If $f_n \to f$ pointwise, each $f_n'$ exists and $f_n' \to g$ \textbf{uniformly}, then $f$ is differentiable and $f' = g$.
+\\
+\underline{Note}: It is the derivatives that must converge uniformly, not $f_n$ itself.
+
+\subsection{Weierstrass M-Test}
+
+\thm{Weierstrass M-Test} For $f_n: A \to \mathbb{R}$, if $\exists$ constants $M_n \geq 0$ s.t.
+\[
+|f_n(x)| \leq M_n\ \forall x \in A, \quad \text{and} \quad \sum_{n=1}^\infty M_n < \infty
+\]
+then $\sum_{n=1}^\infty f_n$ converges uniformly (and absolutely) on $A$.
+\\
+
+\subsection{Power Series}
+
+A \deff{Power Series} about $c$ is $\sum_{n=0}^\infty a_n(x - c)^n$.
+
+\deff{Radius of Convergence}: $R = \frac{1}{\limsup_{n \to \infty} |a_n|^{1/n}}$.
+\begin{itemize}
+    \item Converges absolutely for $|x - c| < R$; diverges for $|x - c| > R$; boundary $|x-c|=R$ requires separate analysis.
+    \item For $r < R$, the series converges \textbf{uniformly} on $[c-r, c+r]$.
+\end{itemize}
+
+\thm{Theorem} A power series is differentiable (and integrable) term-by-term inside its radius of convergence, with the same radius of convergence.
+\[
+\left(\sum_{n=0}^\infty a_n(x-c)^n\right)' = \sum_{n=1}^\infty n\, a_n(x-c)^{n-1}
+\]
+
+\section{Banach Fixed Point Theorem}
+\thm{Banach Fixed Point / Contraction Mapping Theorem} Let $(X, d)$ be a complete metric space and $f: X \to X$ satisfy
+\[
+d(f(x), f(y)) \le C \cdot d(x, y), \quad \forall x, y \in X
+\]
+for some $C \in (0, 1)$. Then $\exists! \ x_0 \in X$ s.t. $f(x_0) = x_0$ (a unique \deff{Fixed Point}).
+\\
+\underline{Proof sketch}: Take any $x \in X$, form the iterative sequence $x, f(x), f^2(x), \ldots$ This is Cauchy since
+\[
+d(f^n(x), f^m(x)) \le \frac{C^n}{1 - C} \cdot d(x, f(x)) \xrightarrow{n \to \infty} 0
+\]
+Completeness gives convergence to some $x^*$; continuity of $f$ gives $f(x^*) = x^*$.
 
 
 
+
+\section{Additional Results}
+
+\subsection{Stolz's Theorem}
+\thm{Stolz's Theorem} Suppose $(b_n)$ is strictly increasing and unbounded, and
+\[
+\lim_{n \to \infty} \frac{a_{n+1} - a_n}{b_{n+1} - b_n} = L
+\]
+Then $\lim_{n \to \infty} \frac{a_n}{b_n} = L$.
+\\
+\underline{Special case} (Ces\`{a}ro mean): If $\lim_{n \to \infty} a_n = A$, then
+\[
+\lim_{n \to \infty} \frac{a_1 + a_2 + \cdots + a_n}{n} = A
+\]
+i.e. if terms settle to $A$, their running average does too.
+
+
+
+
+\subsection{H\"{o}lder Condition}
+$f: A \to \mathbb{R}$ satisfies a \deff{H\"{o}lder Condition} with exponent $\alpha > 0$ if $\exists K > 0$ s.t.
+\[
+|f(x) - f(y)| \le K|x - y|^\alpha, \quad \forall x, y \in A
+\]
+\underline{Note}: H\"{o}lder $\implies$ uniformly continuous. $\alpha = 1$ recovers the Lipschitz condition.
+
+
+
+
+\subsection{Composition of Functions Limit}
+\thm{Theorem} If $\lim_{x \to c} g(x) = L$ and $\lim_{y \to L} f(y) = A$, with $g(x) \neq L$ in some punctured neighbourhood of $c$, then
+\[
+\lim_{x \to c} f(g(x)) = A
+\]
+\underline{Note}: If $f, g$ are both continuous, the condition $g(x) \neq L$ is not required.
+
+
+
+
+\subsection{Important Functional Limits}
+\[
+\lim_{x \to 0} \frac{\sin x}{x} = 1, \quad \lim_{x \to 0} \frac{\ln{1+x}}{x} = \log_a e, \quad \lim_{x \to 0} \frac{a^x - 1}{x} = \ln a
+\]
+\[
+\lim_{x\to 0} \frac{(1+x)^a-1}{x} = a, \quad \lim_{x \to 0} \frac{1-\cos x}{x^2}=\frac{1}{2}, \quad \lim_{x \to 0} \frac{\tan x}{x} = 1
+\]
+
+
+
+
+\subsection{Dini's Theorem}
+\thm{Dini's Theorem} Let $K$ be compact, each $f_n: K \to \mathbb{R}$ continuous, and $f_n \to f$ pointwise to a continuous $f$. If the convergence is \textbf{monotone} (i.e. $f_n(x) \le f_{n+1}(x)$ or $f_n(x) \ge f_{n+1}(x)$, $\forall x \in K$), then
+\[
+f_n \to f \text{ uniformly on } K
+\]
+
+\underline{Note}: All four conditions are necessary: compact domain, continuous $f_n$, continuous limit $f$, monotone convergence.
+
+
+
+
+\subsection{Abel's Theorem on Continuity at Endpoints}
+\thm{Abel's Theorem} Let $\sum_{n=0}^\infty a_n(x-c)^n$ have radius of convergence $R$. If the series \textbf{converges} at an endpoint, say $x = c + R$, then the power series is \textbf{continuous} at that endpoint from the interior:
+\[
+\lim_{x \to (c+R)^-} \sum_{n=0}^\infty a_n(x-c)^n = \sum_{n=0}^\infty a_n R^n
+\]
+
+
+
+
+\subsection{$C[a,b]$ with Sup-Norm is Complete}
+The space $(C[a,b], \| \cdot \|_{\sup})$ where $\|f\|_{\sup} = \sup_{x \in [a,b]} |f(x)|$ is a \textbf{complete} metric space.
+\\
+\underline{Note}: This is essentially the statement that uniform limits of continuous functions are continuous, repackaged as completeness of the space.
+
+
+
+
+\subsection{Nested Compact Sets}
+\thm{Nested Compact Sets Theorem} If $K_1 \supseteq K_2 \supseteq \cdots$ is a nested sequence of non-empty compact sets in a metric space $(S, d)$, then
+\[
+\bigcap_{n=1}^\infty K_n \neq \emptyset
+\]
+\underline{Note}: Generalises the Nested Interval Property to compact sets in arbitrary metric spaces.
 
 \section{Intermediate Results \& Lemmas}
 \citeqn{(Tut10Qn4)} For any two functions $f, g: \mathbb{R} \to \mathbb{R}$ continuous on $\mathbb{R}$, if $f(x) = g(x), \forall x \in \mathbb{Q}$, then $f(x) = g(x), \forall x \in \mathbb{R}$.
