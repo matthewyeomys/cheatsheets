@@ -3,10 +3,10 @@
 % Modified By Matthew Yeo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[11pt,portrait,letterpaper]{article}
+\documentclass[8pt,landscape,letterpaper]{article}
 \usepackage{amssymb,amsmath,amsthm,physics,bbm}
 \usepackage{multicol,multirow,spverbatim,graphicx,ifthen}
-\usepackage[portrait]{geometry}
+\usepackage[landscape]{geometry}
 \usepackage[colorlinks=true,urlcolor=olgreen]{hyperref}
 \usepackage{booktabs,fontspec,unicode-math,listings,minted,microtype,ulem,empheq}
 \setmainfont[Ligatures=TeX]{TeX Gyre Pagella}
@@ -20,17 +20,16 @@
 \makeatother
 
 \ifthenelse{\lengthtest{\paperwidth = 11in}}
-    {\geometry{margin=0.4in}}
-    {\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm}}
+    {\geometry{margin=0.3in}}
+    {\geometry{top=0.5cm,left=0.5cm,right=0.5cm,bottom=0.5cm}}
 \pagestyle{empty}
 \makeatletter
-\renewcommand{\section}{\@startsection{section}{1}{0mm}{-1ex plus -.5ex minus -.2ex}{0.5ex plus .2ex}{\sffamily\large}}
-\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}{-1ex plus -.5ex minus -.2ex}{0.5ex plus .2ex}{\sffamily\normalsize\itshape}}
-\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}{-1ex plus -.5ex minus -.2ex}{1ex plus .2ex}{\normalfont\small\itshape}}
+\renewcommand{\section}{\@startsection{section}{1}{0mm}{-0.7ex plus -.3ex minus -.1ex}{0.2ex plus .1ex}{\sffamily\small\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}{-0.5ex plus -.3ex minus -.1ex}{0.2ex plus .1ex}{\sffamily\footnotesize\itshape}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}{-0.4ex plus -.2ex minus -.1ex}{0.1ex plus .1ex}{\normalfont\scriptsize\itshape}}
 \makeatother
 \setcounter{secnumdepth}{0}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0pt plus 0.5ex}
 
 \usepackage{academicons}
 
@@ -50,16 +49,16 @@
 \newcommand{\citeqn}[1]{\underline{\textit{#1}}}
 \newcommand{\thm}[1]{\color{theoremRed}{\uline{{\textbf{#1}}}}\color{black}}
 
+\footnotesize
 \setlength{\premulticols}{0pt}
 \setlength{\postmulticols}{0pt}
 \setlength{\multicolsep}{1pt}
-\setlength{\columnsep}{1.8em}
-\begin{multicols}{2}
+\setlength{\columnsep}{1.4em}
+\setlength{\parskip}{0pt}
+\setlength{\tabcolsep}{2pt}
+\begin{multicols}{3}
 
-\begin{center}
-{\huge\bfseries CS2030S MT AY25/26}\\
-{\large holy cheatsheet}
-\end{center}
+{\large\bfseries CS2030S Cheatsheet AY25/26}
 
 % -----------------------------------------------------------------------
 \section{1. Types}
@@ -381,7 +380,8 @@ Let \verb|m| be a monad, \verb|f|, \verb|g| return \verb|M<T>|:
 \begin{itemize}
     \item \textbf{Left identity}: \verb|M.of(x).flatMap(f)| $\equiv$ \verb|f.apply(x)|
     \item \textbf{Right identity}: \verb|m.flatMap(M::of)| $\equiv$ \verb|m|
-    \item \textbf{Associativity}: \verb|m.flatMap(f).flatMap(g)| $\equiv$ \verb|m.flatMap(x -> f.apply(x).flatMap(g))|
+    \item \textbf{Associativity}: \verb|m.flatMap(f).flatMap(g)| $\equiv$ \\
+    \verb|m.flatMap(x -> f.apply(x).flatMap(g))|
 \end{itemize}
 A \deff{Functor} only requires \verb|map|. All monads are functors; not all functors are monads.
 
