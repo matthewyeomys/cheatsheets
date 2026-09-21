@@ -1,0 +1,350 @@
+\documentclass[8pt]{extarticle}
+
+% ---------- Layout ----------
+\usepackage[a4paper,landscape,margin=0.35cm]{geometry}
+\usepackage{multicol}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{titlesec}
+\usepackage{parskip}
+
+\tcbuselibrary{skins,breakable}
+
+\setlength{\parindent}{0pt}
+\setlist[itemize]{itemsep=0pt,topsep=1pt,partopsep=0pt,parsep=0pt,leftmargin=1.1em}
+\setlength{\columnsep}{0.5cm}
+\setlength{\columnseprule}{0.3pt}
+
+% ---------- Section styling ----------
+\titleformat{\section}{\normalfont\bfseries\large\color{blue!55!black}}{}{0pt}{}
+\titlespacing{\section}{0pt}{4pt}{2pt}
+\titleformat{\subsection}{\normalfont\bfseries\color{red!55!black}}{}{0pt}{}
+\titlespacing{\subsection}{0pt}{3pt}{1pt}
+
+% ---------- Box for key formulas ----------
+\newtcolorbox{key}{
+  colback=blue!4, colframe=blue!45!black, boxrule=0.4pt,
+  arc=1pt, left=3pt, right=3pt, top=1.5pt, bottom=1.5pt,
+  boxsep=0pt, before skip=2pt, after skip=3pt
+}
+\newtcolorbox{tab}{
+  colback=yellow!6, colframe=black!55, boxrule=0.4pt,
+  arc=1pt, left=2pt, right=2pt, top=1.5pt, bottom=1.5pt,
+  boxsep=0pt, before skip=2pt, after skip=3pt, breakable
+}
+
+\newcommand{\stir}[2]{\genfrac{\{}{\}}{0pt}{}{#1}{#2}}   % Stirling 2nd kind
+\newcommand{\stirf}[2]{\genfrac{[}{]}{0pt}{}{#1}{#2}}    % Stirling 1st kind (unsigned)
+\newcommand{\falling}[1]{#1^{\underline{\phantom{x}}}}
+\newcommand{\note}[1]{{\footnotesize\color{gray!70!black}\emph{#1}}}
+
+\pagestyle{empty}
+
+\begin{document}
+\begin{multicols}{4}
+
+\begin{center}
+{\Large\bfseries MA2214 Midterm Cheatsheet}\\
+{\footnotesize Basic counting $\cdot$ Twelvefold way $\cdot$ Generating functions $\cdot$ Recurrences}
+\end{center}
+
+%=================================================================
+\section{1. Basic Counting}
+
+\subsection*{(AP) / (MP) -- the two engines}
+\begin{key}
+\textbf{(AP)} Split into \emph{disjoint} cases, add counts.\\
+\textbf{(MP)} Build in \emph{independent ordered steps}, multiply counts.
+\end{key}
+\note{Intuition: AP = OR (union of disjoint bins), MP = AND (a chain of independent choices).}
+
+\subsection*{(CP) / (DP) -- run them backward}
+\begin{itemize}
+\item \textbf{(CP)} $|U\setminus A| = |U|-|A|$: count the complement when it's easier.
+\item \textbf{(DP)} If a procedure with $m$ outcomes hits every object exactly $r$ times, the number of objects is $m/r$.
+\end{itemize}
+\note{DP is MP in reverse: overcounting by a constant factor $r$ means dividing by $r$.}
+
+\subsection*{Permutations}
+\[ P^n_r = n(n-1)\cdots(n-r+1) = \frac{n!}{(n-r)!} \]
+\note{$r$ ordered picks without replacement from $n$ items.}
+
+\subsection*{Circular permutations (unnamed seats)}
+\[ Q^n_r = \frac{P^n_r}{r} = \frac{n!}{r(n-r)!}, \qquad Q^n_n=(n-1)! \]
+\note{Divide by $r$ rotations (DP). ``Glue a block'': $k$ tied objects $\to$ $k!$ internal orders.}
+\begin{itemize}
+\item $n$ couples, alternating: $(n-1)!\,n!$
+\item $n$ couples, each next to spouse: $2^n(n-1)!$ \ ($n\ge2$; careful at $n=1$: answer is $1$, not $2$)
+\end{itemize}
+
+\subsection*{Combinations}
+\[ \binom{n}{r} = \frac{P^n_r}{r!} = \frac{n!}{r!(n-r)!} = \binom{n}{n-r} \]
+\[\sum_{r=0}^n\binom{n}{r}=2^n \]
+\note{Choose $r$ unordered from $n$: build via ordered pick, then DP by $r!$ (kill the order).}
+
+\textbf{Pascal:} $\binom{n}{r}=\binom{n-1}{r-1}+\binom{n-1}{r}$ \note{(split on whether elt.\ $n$ is chosen)}
+
+\textbf{Double-counting identities} (count $2$ ways):
+\begin{itemize}
+\item $r\binom{n}{r}=n\binom{n-1}{r-1}$
+\item $(n-r+1)\binom{n}{r-1}=r\binom{n}{r}$
+\item $(n-r)\binom{n}{r}=n\binom{n-1}{r}$
+\item $\binom{n}{m}\binom{m}{r}=\binom{n}{r}\binom{n-r}{m-r}$
+\end{itemize}
+\note{Trick: count pairs (a subset, a flagged element inside/outside it) two different orders.}
+
+\textbf{No two consecutive:} \# of $r$-subsets of $[n]$ with no 2 consecutive $=\binom{n-r+1}{r}$.
+\note{Shift $a_i\mapsto a_i-(i-1)$ to kill the gaps -- turns it into an ordinary $r$-subset of a smaller set.}
+
+\textbf{Pairings of $2n$ people} into $n$ unordered pairs:
+\[ \frac{(2n)!}{2^n\,n!} = (2n-1)!! \]
+\note{Line up, cut into pairs: divide out $2^n$ (order within pair) and $n!$ (order of pairs).}
+
+\subsection*{PIE}
+\[ |A\cup B| = |A|+|B|-|A\cap B| \]
+\[ |A_1\cup\cdots\cup A_q| = \sum|A_i| - \sum|A_i\cap A_j| \]
+\[{}+ \sum|A_i\cap A_j\cap A_k| - \cdots \]
+\note{Each element in $k$ sets gets counted $\binom{k}{1}-\binom{k}{2}+\cdots = 1$ time, net.}
+
+\textbf{Euler's $\varphi$:} $n=p_1^{m_1}\cdots p_k^{m_k} \Rightarrow \varphi(n)=n\prod_{i=1}^k\left(1-\dfrac1{p_i}\right)$
+\note{PIE on ``divisible by $p_i$''; only distinct primes matter, exponents don't.}
+
+\subsection*{(IP) / (BP)}
+\begin{itemize}
+\item Injection $A\to B$ $\Rightarrow |A|\le|B|$.
+\item Bijection $A\to B$ $\Rightarrow |A|=|B|$.
+\end{itemize}
+\note{Workhorse: count $A$ by matching it to a set $B$ you already know how to count. Check injective (read object back off image) + surjective (every image hit).}
+
+\textbf{Lattice paths} $X\to Y$ ($m$ E-steps, $n$ N-steps): $\binom{m+n}{n}$ (word in E's/N's).
+
+\textbf{Subsets:} $|\mathcal P(X)|=2^n$ via characteristic vectors in $\{0,1\}^n$.
+
+%=================================================================
+\section{2. The Twelvefold Way}
+\note{$r$ objects into $n$ boxes; objects/boxes each distinct or identical; no restriction / injective (each box $\le 1$) / surjective (each box $\ge1$).}
+
+\begin{tab}
+\centering
+\renewcommand{\arraystretch}{1.9}
+\begin{tabular}{@{}l c c c@{}}
+\toprule
+ & No restr. & Inject. & Surject. \\
+\midrule
+Obj D, Box D & $n^r$ & $P^n_r$ & $n!\stir{r}{n}$ \\
+Obj D, Box I & $\sum\limits_{k=0}^n\stir{r}{k}$ & $[r\le n]$ & $\stir{r}{n}$ \\
+Obj I, Box D & $\dbinom{r+n-1}{r}$ & $\dbinom{n}{r}$ & $\dbinom{r-1}{n-1}$ \\
+Obj I, Box I & $\sum\limits_{k=0}^n p(r,k)$ & $[r\le n]$ & $p(r,n)$ \\
+\bottomrule
+\end{tabular}
+\end{tab}
+\note{$[r\le n]$ means $1$ if $r\le n$, else $0$. D=distinct, I=identical.}
+
+\subsection*{Stars and bars (Obj I, Box D)}
+\[ \binom{r+n-1}{r} \]
+\note{\# arrangements of $r$ identical stars and $(n-1)$ bars.}
+\note{Same count answers: nonneg.\ int. solutions of $x_1+\cdots+x_n=r$; multisets of size $r$ from $n$ types ($H^n_r$).}
+Surjective version (no box empty): bars go in $r-1$ \emph{internal} gaps only:
+\[ \binom{r-1}{n-1} \]
+
+\subsection*{Multisets \& permutations}
+\begin{itemize}
+\item Permutations of $\{r_1\cdot a_1,\dots,r_n\cdot a_n\}$, $r=\sum r_i$: $\dfrac{r!}{r_1!\cdots r_n!}$
+\item $r$-perms.\ of $\{\infty\cdot a_1,\dots,\infty\cdot a_n\}$: $n^r$
+\end{itemize}
+
+\subsection*{Stirling numbers, 2nd kind $\stir{r}{n}$}
+\emph{\# partitions of $r$ distinct elts.\ into $n$ nonempty unlabelled blocks.}
+\begin{key}
+$\stir{r}{n}=n\stir{r-1}{n}+\stir{r-1}{n-1}$, \quad $\stir{0}{0}=1$
+\end{key}
+\note{Split on element $r$: alone in new block ($\stir{r-1}{n-1}$), or joins one of $n$ existing blocks ($n\stir{r-1}{n}$).}
+\textbf{Explicit (via PIE on surjections):}
+\[ \stir{r}{n} = \frac1{n!}\sum_{j=0}^n(-1)^{n-j}\binom{n}{j}j^r \]
+\note{$n!\stir{r}{n}=$ \# surjections $[r]\to[n]$ (label the blocks).}
+\textbf{Falling factorial:} $x^{\underline r}=x(x-1)\cdots(x-r+1)$
+\[ x^r = \sum_{k=0}^r \stir{r}{k}\, x^{\underline k} \]
+\note{Count functions $[r]\to[m]$ two ways: directly $m^r$, or by image size $k$.}
+\textbf{Bell number} $B_r=\sum_k\stir{r}{k}$ = \# all partitions of an $r$-set.
+
+\subsection*{Stirling numbers, 1st kind (unsigned) $\stirf{r}{n}$}
+\emph{\# permutations of $r$ elts.\ with exactly $n$ disjoint cycles.}
+\begin{key}
+$\stirf{r}{n}=(r-1)\stirf{r-1}{n}+\stirf{r-1}{n-1}$
+\end{key}
+\note{Insert elt.\ $r$: start new cycle alone ($\stirf{r-1}{n-1}$), or slot into 1 of $r-1$ arc-positions of an existing cycle ($(r-1)\stirf{r-1}{n}$).}
+\textbf{Signed:} $s(r,n)=(-1)^{r-n}\stirf{r}{n}$, and
+\[ x^{\underline r} = \sum_{k=0}^r s(r,k)\,x^k \]
+\note{2nd-kind matrix $[\stir{r}{k}]$ and 1st-kind matrix $[s(r,k)]$ are inverse to each other.}
+
+\subsection*{Integer partitions $p(r,n)$}
+\emph{\# ways to write $r$ as an unordered sum of $n$ positive parts.}
+\begin{key}
+$p(r,n) = p(r-1,n-1) + p(r-n,n)$
+\end{key}
+\note{Split on smallest part: $=1$ (delete it, $p(r-1,n-1)$) or $\ge2$ (strip 1 from every part, $p(r-n,n)$).}
+\note{Ferrers diagram: rows = parts, left-aligned, decreasing. \textbf{Conjugate} (transpose) swaps \#rows $\leftrightarrow$ largest part $\Rightarrow$ \#partitions of $r$ into $n$ parts $=$ \#partitions of $r$ with largest part $n$.}
+No closed form for $p(r,n)$ or $p(r)=\sum_k p(r,k)$ exists (see Ch.\,3 for generating-function attack).
+
+\columnbreak
+%=================================================================
+\section{3. Binomial Thm \& Generating Functions}
+
+\subsection*{Binomial \& multinomial theorems}
+\begin{key}
+\[(x+y)^n=\sum_{r=0}^n\binom{n}{r}x^{n-r}y^r\]
+\end{key}
+\note{Expand unsimplified: each of $n$ factors contributes an $x$ or $y$; a string with $r$ $y$'s is chosen in $\binom nr$ ways.}
+Plug in constants to get identities:
+\begin{itemize}
+\item $x=y=1$: \ $\sum_r\binom{n}{r}=2^n$
+\item $x=1,y=-1$: \ $\sum_r(-1)^r\binom{n}{r}=0$ \ ($n\ge1$)
+\item $\Rightarrow$ even-index sum $=$ odd-index sum $=2^{n-1}$
+\item differentiate \& set $x=1$: $\sum_r r\binom{n}{r}=n\,2^{n-1}$
+\end{itemize}
+\textbf{Multinomial:}
+\[(x_1{+}\cdots{+}x_m)^n=\sum \binom{n}{n_1,\dots,n_m}x_1^{n_1}\cdots x_m^{n_m}\]
+\[\binom{n}{n_1,\dots,n_m}=\frac{n!}{n_1!\cdots n_m!}\]
+\note{Distribute $n$ distinct positions among $m$ letters; $n_1{+}\cdots{+}n_m=n$.}
+
+\subsection*{Generating functions -- setup}
+$F(x)=\sum_n a_nx^n$ encodes sequence $(a_n)$; $[x^r]F(x)=a_r$.
+Cauchy product: $FG\leftrightarrow c_r=\sum_{k=0}^r a_kb_{r-k}$.
+
+\begin{key}
+\textbf{Product interpretation:} if $x_i\in A^{(i)}$ has factor $F^{(i)}(x)=\sum_{k\in A^{(i)}}x^k$, then
+\[[x^r]\,F^{(1)}(x)\cdots F^{(m)}(x)\]
+\[= \#\{x_1+\cdots+x_m=r : x_i\in A^{(i)}\}\]
+\end{key}
+\note{Weighted version: use $x^{ik}$ for a variable with coefficient $i$ (e.g.\ coin values, dice weights).}
+
+\textbf{Encoding dictionary:}
+\begin{tab}
+\centering\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}l c@{}}
+\toprule
+constraint & factor \\ \midrule
+none & $1/(1-x)$ \\
+$x_i\ge a$ & $x^a/(1-x)$ \\
+$x_i\le b$ & $(1-x^{b+1})/(1-x)$ \\
+$a\le x_i\le b$ & $(x^a-x^{b+1})/(1-x)$ \\
+$x_i$ even & $1/(1-x^2)$ \\
+$x_i$ mult.\ of $k$ & $1/(1-x^k)$ \\
+\bottomrule
+\end{tabular}
+\end{tab}
+
+\subsection*{Extracting coefficients (the toolkit)}
+\begin{itemize}
+\item \textbf{Cumulative sum:} $\dfrac{1}{1-x}F(x) \leftrightarrow c_r=a_0+\cdots+a_r$
+\item \textbf{Stars and bars:} $\dfrac{1}{(1-x)^n}=\displaystyle\sum_{r\ge0}\binom{r+n-1}{n-1}x^r$
+\item \textbf{Shifting:} $[x^r]\,x^mF(x)=[x^{r-m}]F(x)$
+\item \textbf{Partial fractions, distinct roots:} $\dfrac{P(x)}{\prod(1-r_ix)}=\sum\dfrac{A_i}{1-r_ix}$, and $\dfrac1{1-rx}=\sum r^nx^n$.
+\item \textbf{Repeated root, mult.\ $m$:} $\dfrac1{(1-rx)^j}=\sum_n\binom{n+j-1}{j-1}r^nx^n$
+\end{itemize}
+\note{Recipe: (1) write down $F(x)$ from the dictionary, (2) simplify/factor, (3) apply the toolkit.}
+
+\subsection*{Integer partitions via GF}
+\[ \sum_{r\ge0}p(r)x^r = \prod_{k\ge1}\frac{1}{1-x^k} \]
+\note{Factor $k$ tracks $m_k=$ \# parts equal to $k$; multiplicities are the exponents.}
+\textbf{Euler:} \# partitions into distinct parts $=$ \# partitions into odd parts.
+\note{Proof: $D(x)=\prod(1+x^k)=\prod\frac{1-x^{2k}}{1-x^k}$ telescopes to $\prod\frac1{1-x^{2m-1}}=O(x)$.}
+
+\subsection*{Exponential generating functions (EGF)}
+\[ \sum_{r\ge0}a_r\frac{x^r}{r!} \]
+\note{OGF $\to$ selection/distribution problems (order irrelevant). EGF $\to$ arrangement problems (order matters).}
+\begin{key}
+\textbf{Product rule:} EGF of ``mix several kinds of objects in an arrangement'' $=$ product of each kind's EGF (binomial convolution: coeff.\ $\sum_i\binom ri a_ib_{r-i}$).
+\end{key}
+\textbf{Dictionary} (type may appear):
+\begin{tab}
+\centering\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}l c@{}}
+\toprule
+restriction & EGF factor \\ \midrule
+any \# times & $e^x$ \\
+at most $n$ times & $1+\frac{x}{1!}+\cdots+\frac{x^n}{n!}$ \\
+at least once & $e^x-1$ \\
+even \# times & $(e^x+e^{-x})/2$ \\
+odd \# times & $(e^x-e^{-x})/2$ \\
+\bottomrule
+\end{tabular}
+\end{tab}
+\note{Read off coefficients using $e^{nx}=\sum_r n^r\,x^r/r!$. This is PIE done by algebra.}
+
+\columnbreak
+%=================================================================
+\section{4. Recurrence Relations}
+
+\subsection*{From counting problem to recurrence}
+\note{Find the size parameter $n$; look at the ``last piece'' (last tile, largest disk, last element); split into disjoint cases by (AP); get initial conditions from small cases.}
+\textbf{Tiling $1\times n$ with $1\times1,1\times2$:} $a_{n+2}=a_{n+1}+a_n$ (Fibonacci).\\
+\textbf{Tower of Hanoi:} $a_n=2a_{n-1}+1,\ a_1=1 \Rightarrow a_n=2^n-1$.
+
+\subsection*{Linear homogeneous recurrences}
+$c_0a_n+c_1a_{n-1}+\cdots+c_ra_{n-r}=0$. Try $a_n=x^n\Rightarrow$
+\begin{key}
+\textbf{Characteristic eqn:} $c_0x^r+c_1x^{r-1}+\cdots+c_r=0$
+\end{key}
+\textbf{Main Thm.}
+\begin{itemize}
+\item \textbf{(I) distinct roots} $\alpha_1,\dots,\alpha_r$: \ $a_n=A_1\alpha_1^n+\cdots+A_r\alpha_r^n$
+\item \textbf{(II) root $\alpha_i$ w/ multiplicity $m_i$:} contributes $(A_{i1}+A_{i2}n+\cdots+A_{im_i}n^{m_i-1})\alpha_i^n$
+\end{itemize}
+\note{Then plug in initial conditions to solve for the $A$'s (linear system).}
+\note{Complex roots come in conjugate pairs $re^{\pm i\theta}$; combine to real form $2r^n\cos(n\theta+\phi)$, or just keep as $A(re^{i\theta})^n+\bar A(re^{-i\theta})^n$.}
+
+\textbf{Fibonacci} ($a_0=a_1=1$): roots $\frac{1\pm\sqrt5}2$, Binet's formula
+$a_n=\frac1{\sqrt5}\!\left[\left(\frac{1+\sqrt5}2\right)^{n+1}\!\!-\left(\frac{1-\sqrt5}2\right)^{n+1}\right]$.
+
+\subsection*{General (non-homogeneous) linear recurrences}
+$c_0a_n+\cdots+c_ra_{n-r}=f(n)$.
+\begin{key}
+General solution $=$ (homog.\ solution $h(n)$) $+$ (one particular solution $g_0(n)$)
+\end{key}
+\note{Difference of any two solutions solves the homogeneous equation -- so this always works, like ODEs.}
+\textbf{Trial forms for $g_0(n)$} (base $a$; if $a$ is a root of mult. $m$, multiply trial by $n^m$):
+\begin{tab}
+\centering\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}l c@{}}
+\toprule
+$f(n)$ & trial $g_0(n)$ \\ \midrule
+$P_k(n)$ (poly., $a{=}1$) & $Q_k(n)$ \\
+$c\,a^n$ & $C\,a^n$ \\
+$P_k(n)\,a^n$ & $Q_k(n)\,a^n$ \\
+$f_1+f_2$ & $g_{0,1}+g_{0,2}$ (superposition) \\
+\bottomrule
+\end{tabular}
+\end{tab}
+\note{Substitute trial into recurrence, match coefficients.}
+
+\subsection*{Generating function method (handles everything at once)}
+\textbf{Steps:} (1) mult.\ recurrence by $x^n$, sum over valid $n$ $\Rightarrow$ linear eqn.\ for $A(x)$;\ (2) solve for $A(x)$ (rational function);\ (3) partial fractions $\to$ read off $a_n$.
+\begin{key}
+Bookkeeping: $\displaystyle\sum_{n\ge k}a_{n-k}x^n=x^kA(x)$, \quad $\displaystyle\sum_{n\ge k}a_nx^n=A(x)-\sum_{i<k}a_ix^i$
+\end{key}
+\textbf{Common OGFs:} $a_n{=}1\!\to\!\frac1{1-x}$; \ $a_n{=}n\!\to\!\frac{x}{(1-x)^2}$; \ $a_n{=}r^n\!\to\!\frac1{1-rx}$.
+\note{Denominator of $A(x)$ = characteristic polynomial read backwards ($c_0+c_1x+\cdots+c_rx^r$); a repeated root of mult.\ $m$ shows up as $(1-\alpha x)^m$ in the denominator, matching Main Thm.\ part (II) automatically. Non-homog.\ $f(n)$ just adds to the numerator -- no separate particular-solution guess needed.}
+
+\textbf{Partial fractions recap:}
+\[\frac{P(x)}{(1-r_1x)(1-r_2x)}=\frac{A}{1-r_1x}+\frac{B}{1-r_2x}\]
+\[A=\frac{P(1/r_1)}{1-r_2/r_1},\qquad B=\frac{P(1/r_2)}{1-r_1/r_2}\]
+
+\subsection*{Systems of recurrences}
+\note{When one sequence's recurrence needs an auxiliary sequence, either (a) eliminate the auxiliary variable algebraically to get one higher-order recurrence, or (b) write both as generating-function equations and solve the linear system for $A(x)$ (usually cleaner). Both sequences share the same denominator (hence the same characteristic roots / growth rate); only the numerator (initial data) differs.}
+
+\subsection*{Quick sanity checklist}
+\begin{itemize}
+\item AP: are the cases really \emph{disjoint} and \emph{exhaustive}?
+\item MP: are the choices really \emph{independent} of earlier ones?
+\item DP/circular: does every group really have the \emph{same} size $r$? (couples $n{=}1$ trap!)
+\item GF: did you get the encoding factor right per variable \emph{before} multiplying?
+\item Recurrence: does the trial form need an extra $n^m$ because the base is a root?
+\end{itemize}
+
+\end{multicols}
+\end{document}
