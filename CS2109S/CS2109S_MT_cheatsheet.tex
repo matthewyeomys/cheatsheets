@@ -1,0 +1,351 @@
+\documentclass[7pt]{extarticle}
+\usepackage[a4paper,landscape,margin=0.32cm,top=0.32cm,bottom=0.32cm,columnsep=0.35cm]{geometry}
+\usepackage{multicol}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage[compact]{titlesec}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\abovedisplayskip}{2pt plus 1pt minus 1pt}
+\setlength{\belowdisplayskip}{2pt plus 1pt minus 1pt}
+\setlength{\abovedisplayshortskip}{1pt plus 1pt minus 1pt}
+\setlength{\belowdisplayshortskip}{1pt plus 1pt minus 1pt}
+\pagestyle{empty}
+\raggedbottom
+
+\definecolor{hd}{RGB}{20,40,90}
+\definecolor{sub}{RGB}{140,20,20}
+\definecolor{lightgray}{RGB}{230,230,230}
+
+\titleformat{\section}{\normalfont\bfseries\small\color{white}}{}{0pt}{}
+\titlespacing{\section}{0pt}{2pt}{1pt}
+\newcommand{\head}[1]{\vspace{1pt}\noindent\colorbox{hd}{\parbox{\dimexpr\linewidth-6pt\relax}{\color{white}\bfseries\small #1}}\vspace{1pt}\par}
+\newcommand{\subhead}[1]{\vspace{1pt}\noindent{\bfseries\color{sub}#1}\par}
+\newcommand{\intu}[1]{{\itshape\footnotesize\color{gray}#1}\par}
+
+\setlist[itemize]{topsep=0pt,itemsep=0pt,parsep=0pt,partopsep=0pt,leftmargin=8pt,label=\textbullet}
+\setlist[enumerate]{topsep=0pt,itemsep=0pt,parsep=0pt,partopsep=0pt,leftmargin=10pt}
+
+\newcommand{\algo}[1]{\vspace{1pt}\noindent\ttfamily\footnotesize #1 \normalfont\vspace{1pt}\par}
+\newcommand{\deq}[1]{\par\noindent\centering$\displaystyle #1$\par\vspace{1pt}\raggedright}
+
+\begin{document}
+\footnotesize
+
+\begin{center}
+{\bfseries\large CS2109S Midterm Cheatsheet} \hfill Lectures 1--5: Agents, Search, Adversarial Search, ML Intro, Decision Trees, Linear Regression
+\end{center}
+
+\begin{multicols}{4}\raggedcolumns
+
+%============================================================
+\head{1. Intelligent Agents}
+AI: study of agents that receive percepts \& act on environment. Agent = program + architecture.
+
+\textbf{PEAS}: Performance measure, Environment, Actuators, Sensors. A \textbf{rational agent} chooses actions maximizing performance measure given percepts \& knowledge.
+
+\subhead{Task Environment Properties}
+\begin{itemize}
+\item \textbf{Fully} vs \textbf{Partially} observable: sensors give complete state or not
+\item \textbf{Single} vs \textbf{Multi}-agent
+\item \textbf{Deterministic} vs \textbf{Stochastic}: next state fully determined by current state+action, or involves probabilities
+\item \textbf{Episodic} vs \textbf{Sequential}: episodes independent, or current decision affects future
+\item \textbf{Static} vs \textbf{Dynamic} (semi-dynamic: world fixed but score changes with time)
+\item \textbf{Discrete} vs \textbf{Continuous}: state/time/per\-cepts/actions
+\item \textbf{Known} vs \textbf{Unknown}: outcomes of actions given or not
+\end{itemize}
+This course: fully-observable, deterministic, static, known only.
+
+\subhead{Agent Structures}
+\begin{itemize}
+\item \textbf{Simple reflex}: condition--action rules only
+\item \textbf{Goal-based}: acts to achieve a goal (search-based)
+\item \textbf{Utility-based}: maximizes a utility (score) function
+\item \textbf{Learning agent}: Performance element (acts), Learning element (improves PE), Critic (feedback vs standard), Problem generator (proposes exploration)
+\end{itemize}
+\intu{Exploration vs exploitation: learn about world vs maximize gain now.}
+
+\subhead{Problem Formulation (systematic search)}
+\begin{itemize}
+\item \textbf{States}: state-space
+\item \textbf{Initial state}
+\item \textbf{Goal test/state(s)}
+\item \textbf{Actions} $actions(state)$; branching factor $b$: $|actions(s)|\le b\ \forall s$
+\item \textbf{Transition}: $new\_state=transition(state,action)$
+\item \textbf{Action cost function}
+\end{itemize}
+Steps: Goal Formulation $\to$ Problem Formulation $\to$ Search $\to$ Execute.
+
+%============================================================
+\head{2. Search Fundamentals}
+\textbf{Path}: sequence of actions. \textbf{Solution}: path from initial to goal state. \textbf{Optimal solution}: lowest path cost.
+A search algo implicitly builds a \textbf{search tree}; a \textbf{node} holds a state (state may repeat across nodes).
+
+\algo{create frontier\\
+insert Node(initial\_state)\\
+while frontier not empty:\\
+\ \ node = frontier.pop()\\
+\ \ if node.state is goal: return solution\\
+\ \ for action in actions(node.state):\\
+\ \ \ \ next = transition(node.state,action)\\
+\ \ \ \ frontier.add(Node(next))\\
+return failure}
+
+\textbf{Complete}: finds a solution if one exists (for every instance).
+\textbf{Optimal}: every solution it returns is the best possible.
+(An algo can be optimal \emph{and} incomplete!)
+
+\subhead{Uninformed Search (no info on goal distance)}
+\begin{itemize}
+\item \textbf{BFS}: frontier=\textbf{queue}. Explores layer by layer. Complete \& optimal if finite $b$, goal at finite depth, unit step cost.
+\item \textbf{UCS}: frontier=\textbf{priority queue} by path cost $g(n)$. Expands "tier by tier" of cost. Complete/optimal if all costs $\ge \epsilon>0$ (complete) / $\ge 0$ (optimal).
+\item \textbf{DFS}: frontier=\textbf{stack}. Goes deep, backtracks. Poly space, NOT complete (infinite depth) NOT optimal.
+\end{itemize}
+\intu{Queue=FIFO=BFS spreads outward evenly; Stack=LIFO=DFS commits to one path; Priority queue=cheapest-first=UCS.}
+Graph search variant adds a \textbf{visited} set to avoid repeats.
+
+\subhead{Search Strategies}
+\begin{itemize}
+\item \textbf{DLS} (depth-limited): DFS with depth cutoff $l$; backtrack at limit. Poly space, NOT complete/optimal.
+\item \textbf{IDS} (iterative deepening): run DLS for $l=0,1,2,\dots$ Poly space (like DFS) but complete \& optimal (like BFS)! Overhead from re-exploring shallow nodes is acceptable since cost is dominated by deepest layer.
+\end{itemize}
+
+%============================================================
+\head{3. Informed Search}
+\textbf{Heuristic} $h(n)$: estimate of optimal cost from $n$ to a goal. Must be $\ge 0$, $h(goal)=0$.
+
+\textbf{Greedy Best-First}: $f(n)=h(n)$ only $\Rightarrow$ fast but suboptimal.
+
+\textbf{A* Search}: priority queue on
+\deq{f(n)=g(n)+h(n)}
+$g(n)$=cost so far, $h(n)$=heuristic to goal.
+\intu{$g$ trusts the past, $h$ guesses the future -- A* balances both.}
+
+\textbf{Admissible}: $0\le h(n)\le h^*(n)$ for every $n$ (never overestimates true cost $h^*$).
+$\Rightarrow$ A* \emph{without} visited memory: complete \& optimal.
+
+\textbf{Consistent} (triangle inequality): $h(n)\le c(n,a,n')+h(n')$.
+$\Rightarrow$ A* with or without visited memory: complete \& optimal.
+Consistency $\Rightarrow$ Admissibility.
+
+\textbf{Dominance}: if $h_1(n)\ge h_2(n)\ \forall n$ (both admissible), $h_1$ dominates $h_2$ $\Rightarrow$ $h_1$ better (fewer nodes expanded, closer to $h^*$).
+
+\subhead{Inventing Heuristics}
+\begin{itemize}
+\item \textbf{Relaxed problem}: fewer restrictions on actions; its optimal cost is admissible for original. E.g. straight-line distance (drop road constraint).
+\item \textbf{Pattern databases}: precompute exact costs for subproblems.
+\item \textbf{Learning} from data.
+\end{itemize}
+
+\subhead{Search Algorithms Summary (worst case)}
+\begin{tabularx}{\linewidth}{@{}l@{\ }c@{\ }c@{\ }c@{\ }c@{}}
+\hline
+Algo & Time & Space & Compl.? & Opt.?\\
+\hline
+BFS & Exp & Exp & Yes & Yes\\
+UCS & Exp & Exp & Yes$^3$ & Yes$^3$\\
+DFS & Exp & Poly & No/Yes$^4$ & No\\
+DLS & Exp & Poly$^2$ & No & No$^2$\\
+IDS & Exp & Poly$^2$ & Yes & Yes\\
+A* & Exp & Exp & Yes$^3$ & if admiss.\\
+A*+mem & Exp & Exp & Yes$^3$ & if consist.\\
+\hline
+\end{tabularx}
+{\scriptsize $^1$ w.r.t. depth/tier $^2$ if used w/ DFS $^3$ if edge costs $\ge0$ $^4$ with visited memory}
+
+%============================================================
+\head{4. Local Search}
+For hard/huge state spaces (TSP, CSPs, continuous opt.) -- systematic search intractable (NP-hard). Local search: no path/reached-set tracking; \textbf{solution = a state}. Not systematic $\Rightarrow$ typically incomplete/suboptimal, but low memory, works on huge/infinite spaces.
+
+\textbf{Successor function}: generates neighbouring states (replaces actions/transition).
+\textbf{Evaluation (fitness) function}: $value=eval(state)$; minimize or maximize.
+
+\textbf{Hill Climbing} (steepest ascent):
+\algo{current = initial\_state\\
+while True:\\
+\ \ best = highest-eval successor of current\\
+\ \ if eval(best) <= eval(current): return current\\
+\ \ current = best}
+\intu{Always take the best next step -- greedy, can get stuck.}
+\textbf{Landscape}: Global max (best overall); Local max (best among neighbors only); Shoulder (flat region, hard to escape).
+
+%============================================================
+\head{5. Adversarial Search}
+Multi-agent: Competitive (opposing goals) / Cooperative / Mixed-motive.
+\textbf{Two-player zero-sum, turn-taking}: fully observable, deterministic, discrete, no infinite runs.
+
+\subhead{Problem Formulation}
+States, Initial state, \textbf{Terminal states} (win/lose/draw), Actions, Transition, \textbf{Utility function} $utility(state)$ = value from Player A's perspective (e.g.\ $+1/-1/0$).
+
+\textbf{Minimax}: assume both play optimally. A maximizes, B minimizes A's outcome.
+\algo{def max\_value(state):\\
+\ \ if is\_terminal(state): return utility(state)\\
+\ \ v = -inf\\
+\ \ for s' in expand(state): v = max(v, min\_value(s'))\\
+\ \ return v\\
+def min\_value(state): (symmetric, v=min, +inf)}
+Time $O(b^m)$ ($b$=branch factor,$m$=max depth); space Poly; Complete if tree finite; Optimal against optimal opponent (against suboptimal opp., minimax never does worse, but might not exploit mistakes).
+
+\subhead{Alpha--Beta Pruning}
+Same result as minimax, fewer nodes evaluated.
+$\alpha$ = best (highest) value for A found so far on path; $\beta$ = best (lowest) value for B found so far on path.
+\intu{$\alpha$/$\beta$ = "best guaranteed option elsewhere" -- stop exploring once a branch can't beat it.}
+\algo{def max\_value(state,a,b):\\
+\ \ if terminal: return utility(state)\\
+\ \ v=-inf\\
+\ \ for s' in expand(state):\\
+\ \ \ \ v=max(v,min\_value(s',a,b)); a=max(a,v)\\
+\ \ \ \ if v>=b: return v\ \ \# prune\\
+\ \ return v\\
+def min\_value(state,a,b): (symmetric: v=min,\\
+\ \ b=min(b,v), prune if v<=a)}
+Rule: at MIN node, if value $\le\alpha$, stop (B won't let A reach here). At MAX node, if value $\ge\beta$, stop (A won't let B improve).
+Best case (perfect move ordering): $O(b^{m/2})$ -- doubles usable search depth.
+
+\subhead{Handling Large Game Trees}
+\textbf{Cutoff}: \texttt{is\_cutoff(state)} = true if terminal OR depth/time budget hit.
+\textbf{Evaluation function}: terminal $\to$ utility; else $\to$ heuristic, with $\min utility \le heuristic(s)\le \max utility$. (Admissibility/consistency don't apply here.)
+Minimax+cutoff returns best move \emph{w.r.t. the estimate} -- not necessarily truly optimal.
+Inventing heuristics: relaxed game (e.g.\ material count), expert knowledge, learned from data.
+
+\end{multicols}
+\newpage
+\begin{multicols}{4}\raggedcolumns
+%============================================================
+\head{6. Intro to Machine Learning}
+ML: subfield of AI -- learn \& improve performance from data.
+\textbf{Types}: Supervised (labeled data), Unsupervised (unlabeled, find structure), Semi-supervised, Reinforcement.
+
+\subhead{Supervised Learning}
+Data $D=\{(x^{(i)},y^{(i)})\}_{i=1}^n$, drawn i.i.d.\ from fixed distribution.
+\textbf{Model} $h:X\to Y$. \textbf{Loss}: guides learning (training data). \textbf{Performance measure}: judges at test time (may share form with loss).
+\textbf{Classification}: $y\in\{1,\dots,K\}$ (discrete). \textbf{Regression}: $y\in\mathbb{R}$ (continuous).
+
+\subhead{Performance Measures -- Regression}
+\deq{MSE=\tfrac{1}{n}\sum_i(\hat y^{(i)}-y^{(i)})^2 \quad MAE=\tfrac{1}{n}\sum_i|\hat y^{(i)}-y^{(i)}|}
+
+\subhead{Performance Measures -- Classification}
+$Accuracy=\tfrac1n\sum_i \mathbb{1}[\hat y^{(i)}=y^{(i)}]=\dfrac{TP+TN}{TP+FN+FP+TN}$
+
+$P=\dfrac{TP}{TP+FP}$ (FP costly, e.g.\ spam). $R=\dfrac{TP}{TP+FN}$ (FN costly, e.g.\ cancer). $F_1=\dfrac{2}{\frac1P+\frac1R}$ (harmonic mean).
+\intu{Precision: of predicted-positive, how many right? Recall: of actual-positive, how many caught? F1 = harmonic mean, balances both. For $K>2$: compute per-class, then average.}
+
+\subhead{Supervised Learning Pipeline}
+Train: Training set $\to$ Learning Algorithm $A$ (uses Loss) $\to$ Model $h(x)$.
+Test: Test set $\to$ Performance Measure $\to$ check generalization.
+
+%============================================================
+\head{7. Decision Trees}
+Inputs: categorical feature vector $x\in\{c_1,\dots,c_m\}^d$. Output: class $y\in\{1,\dots,K\}$.
+Tree: internal nodes = test attribute; branches = outcomes; leaves = predictions (nested if-else).
+\textbf{Optimal DT}: fewest nodes, consistent with data (finding it is NP-hard $\Rightarrow$ use greedy heuristic).
+
+\subhead{Entropy (uncertainty of a random var)}
+\deq{H(Y)=-\sum_{i=1}^k P(y_i)\log_2 P(y_i)}
+Binary (p pos, n neg): $H=-\frac{p}{p+n}\log_2\frac{p}{p+n}-\frac{n}{p+n}\log_2\frac{n}{p+n}$.
+\intu{Entropy = how "mixed" the labels are: 0=pure, 1=maximally uncertain (50/50).}
+
+\textbf{Specific conditional entropy}: $H(Y|X{=}x)$ = entropy of $Y$ restricted to rows where $X=x$.
+\textbf{Conditional entropy}: $H(Y|X)=\sum_{x} P(X{=}x)\,H(Y|X{=}x)$ -- remaining uncertainty about $Y$ after knowing $X$.
+
+\textbf{Information Gain}:
+\deq{IG(Y;X)=H(Y)-H(Y|X)}
+(uncertainty before $-$ uncertainty after). Pick attribute with \emph{highest} IG to split.
+
+\subhead{Decision Tree Learning (DTL)}
+Top-down, greedy (pick locally-best split by IG, no lookahead), recursive.
+\algo{def DTL(rows, attributes, default):\\
+\ if rows empty: return default\\
+\ if rows same class: return that class\\
+\ if attributes empty: return majority\_decision(rows)\\
+\ best = choose\_attribute(attributes, rows) \# max IG\\
+\ tree = new tree, root=best\\
+\ for value\_i of best:\\
+\ \ sub\_i = \{rows with best=value\_i\}\\
+\ \ subtree\_i = DTL(sub\_i, attrs-best, majority(rows))\\
+\ \ add subtree\_i as branch labelled value\_i\\
+\ return tree}
+Base cases: (1) no data for an attribute value $\to$ parent's majority (default); (2) all same label $\to$ that label; (3) out of attributes (noisy/insufficient data) $\to$ majority vote.
+
+\textbf{Representational Completeness}: for any finite consistent dataset w/ discrete features, a DT exists that perfectly classifies it. Benefit: can fit any pattern; Drawback: can fit noise too $\to$ \textbf{overfitting}.
+
+\subhead{Pruning} (simpler, more robust, better generalization)
+\begin{itemize}
+\item \textbf{Max depth}: cap longest root-to-leaf path.
+\item \textbf{Min-sample leaves}: leaf needs $\ge k$ samples, else pruned (use majority/default instead).
+\item Post-pruning (after full growth) -- out of scope.
+\end{itemize}
+
+\subhead{Real-World Data Prep}
+Continuous attrs $\to$ discretize into intervals. Missing values: use most common value (overall or within same class), sample by probability, or drop attribute/row.
+
+%============================================================
+\head{8. Linear Regression}
+Data $D=\{(x^{(i)},y^{(i)})\}$, $x^{(i)}\in\mathbb{R}^d$, $y^{(i)}\in\mathbb{R}$. \textbf{Regression}: predict real-valued $y$ for new $x$.
+
+\textbf{Linear model} ($x_0=1$ dummy):
+\deq{h_w(x)=w^Tx=\sum_{j=0}^d w_jx_j}
+
+\textbf{MSE Loss} (the $\tfrac12$ is for convenience when differentiating):
+\deq{J_{MSE}(w)=\frac{1}{2n}\sum_{i=1}^n\big(h_w(x^{(i)})-y^{(i)}\big)^2}
+Linear regression = linear model + MSE loss.
+
+\subhead{Normal Equation}
+Set gradient $\nabla J_{MSE}(w)=0$:
+\deq{\frac{\partial J_{MSE}}{\partial w_j}=\frac1n\sum_i(w^Tx^{(i)}-y^{(i)})x_j^{(i)}=0}
+In matrix form ($X\in\mathbb{R}^{n\times(d+1)}$ design matrix, row $i$ = $x^{(i)T}$):
+\deq{X^T(Xw-Y)=0\ \Rightarrow\ X^TXw=X^TY\ \Rightarrow\ \boxed{w=(X^TX)^{-1}X^TY}}
+Cost dominated by matrix inversion $O(d^3)$; fails if $X^TX$ not invertible; doesn't work for non-linear models.
+
+\subhead{Gradient Descent}
+\intu{Walk downhill on the loss surface, one small step at a time, always facing the steepest way down.}
+\deq{w_j\leftarrow w_j-\gamma\frac{\partial J(w_0,w_1,\dots)}{\partial w_j}\quad(\gamma>0\text{: learning rate})}
+\textbf{Common mistake}: must compute \emph{all} partials $a=\partial J/\partial w_0, b=\partial J/\partial w_1,\dots$ using the \emph{same/old} $w$ first, THEN update all $w_j$ simultaneously -- not sequentially (that's coordinate descent, different algorithm, no convergence guarantee).
+$\gamma$ too large: overshoots/diverges. $\gamma$ too small: slow convergence.
+
+\subhead{Convexity}
+Convex: chord lies above/on graph. Strictly convex: chord always strictly above (except endpoints). Convex $\Rightarrow$ local min = global min. Strictly convex $\Rightarrow$ unique global min.
+\textbf{Thm}: MSE+linear model is convex; strictly convex if features linearly independent (no feature = lin.\ combo of others). $\Rightarrow$ GD converges to global min (unique if lin.\ indep.\ features), given suitable $\gamma$.
+
+\subhead{Feature Scaling}
+Problem: different feature scales $\Rightarrow$ elongated bowl $\Rightarrow$ GD zig-zags slowly.
+\textbf{Min-max}: $x_i'=\dfrac{x_i-\min(x_i)}{\max(x_i)-\min(x_i)}$ (scales to $[0,1]$).
+\textbf{Standardization}: $x_i'=\dfrac{x_i-\mu_i}{\sigma_i}$ (mean 0, std 1).
+Alt.: separate learning rate $\gamma_j$ per weight (e.g.\ AdaGrad).
+
+\subhead{GD Variants}
+\begin{itemize}
+\item \textbf{Batch GD}: all $n$ examples per step. Accurate, slow/step.
+\item \textbf{Mini-batch GD}: subset per step. Cheaper, noisy gradient (can escape local min/plateau).
+\item \textbf{Stochastic GD (SGD)}: 1 random example per step. Cheapest, noisiest.
+\end{itemize}
+Other issues: slow on large $n$ (needs full pass); non-convex losses (future topics) can trap GD in local min/plateau.
+
+\subhead{GD vs Normal Equation}
+\begin{tabularx}{\linewidth}{@{}l@{\ }c@{\ }c@{}}
+\hline
+ & GD & Normal Eq\\
+\hline
+Choose $\gamma$? & Yes & No\\
+Iterations & Many & None (closed form)\\
+Large $d$? & Fine & Slow, $O(d^3)$\\
+Feature scaling? & May help & Not needed\\
+Constraint & -- & $X^TX$ invertible\\
+\hline
+\end{tabularx}
+
+\subhead{Feature Transformation}
+$\phi:\mathbb{R}^d\to\mathbb{R}^M$ ($M\ge d$). General model view: $\hat h(x)=h(\phi(x))$ ($\phi$=feature map: identity/handcrafted/learned; $h$=predictor, e.g.\ linear).
+\begin{itemize}
+\item \textbf{Polynomial} deg $k$: e.g.\ $\phi_{p2}([x_1,x_2])\to[x_1,x_2,x_1x_2,x_1^2,x_2^2]$ -- "polynomial regression".
+\item \textbf{Log}: augment with $\log(x_i)$. \textbf{Exp}: augment with $\exp(x_i)$.
+\end{itemize}
+Why keep raw features too: model can zero out unneeded weight; needed if relation is part-linear part-nonlinear (e.g.\ $y=3x+0.5x^2$); robust fallback if transform assumption is wrong.
+\textbf{Thm}: linear regression + feature transform is still \emph{convex} (it's linear regression on a new feature set).
+
+\end{multicols}
+\end{document}
