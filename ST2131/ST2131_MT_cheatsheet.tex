@@ -1,0 +1,255 @@
+\documentclass[8pt]{extarticle}
+\usepackage[a4paper,landscape,margin=0.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{multicol}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[explicit]{titlesec}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5pt}
+\setlength{\columnsep}{8pt}
+\setlength{\columnseprule}{0.3pt}
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\setlength{\abovedisplayshortskip}{1pt}
+\setlength{\belowdisplayshortskip}{1pt}
+\setlist{nosep,leftmargin=*,labelsep=3pt}
+
+\definecolor{secblue}{RGB}{20,70,140}
+\definecolor{subred}{RGB}{160,30,40}
+\titleformat{\section}{\normalsize\bfseries\color{white}}{}{0pt}{\colorbox{secblue}{\parbox{\dimexpr\columnwidth-2\fboxsep}{\thesection\ \ #1}}}
+\titlespacing*{\section}{0pt}{3pt}{2pt}
+\titleformat{\subsection}{\small\bfseries\color{subred}}{}{0pt}{#1}
+\titlespacing*{\subsection}{0pt}{3pt}{1pt}
+\renewcommand{\thesection}{\arabic{section}}
+
+\newtcolorbox{idea}{colback=yellow!12,colframe=orange!70!black,boxrule=0.4pt,left=2pt,right=2pt,top=0.5pt,bottom=0.5pt,arc=1pt,before skip=2pt,after skip=2pt,fontupper=\itshape}
+\newtcolorbox{key}{colback=blue!5,colframe=secblue,boxrule=0.4pt,left=2pt,right=2pt,top=0.5pt,bottom=0.5pt,arc=1pt,before skip=2pt,after skip=2pt}
+
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\bin}[2]{\binom{#1}{#2}}
+
+\begin{document}
+\begin{multicols*}{3}
+{\centering\large\bfseries ST2131 MT Cheatsheet AY2627 S1}
+
+%==================================================
+\section{Combinatorial Analysis}
+\subsection{Three basic principles}
+\textbf{(AP) Addition:} $E_1,\dots,E_k$ pairwise disjoint $\Rightarrow$ \#ways at least one occurs $=\sum n_i$. Sets: $A_i\cap A_j=\emptyset\ (i\ne j)\Rightarrow |\bigcup A_i|=\sum|A_i|$.\\
+\textbf{(MP) Multiplication:} task = sequence of $r$ stages with $n_1,\dots,n_r$ choices $\Rightarrow \prod n_i$. Sets: $|A_1\times\cdots\times A_r|=\prod|A_i|$.\\
+\textbf{(CP) Complement:} $A\subseteq U\Rightarrow |U\setminus A|=|U|-|A|$.
+\begin{idea}AP = split into disjoint cases (``or''); MP = build step by step (``and then''); CP = count the bad ones when ``good'' is messy (e.g.\ $a\neq b$: count all, subtract $a=b$).\end{idea}
+Examples: \#functions $\{1..n\}\to\{0,1\}=2^n$; \#$k$-ary sequences of length $n=k^n$; $\sum_{k=1}^n k^2=\tfrac{n(n+1)(2n+1)}{6}$.
+
+\subsection{Permutations and combinations}
+$r$-permutation (ordered, no repeats): $P^n_r=n(n-1)\cdots(n-r+1)=\dfrac{n!}{(n-r)!}$; $0!=1$, $P^n_n=n!$.\\
+$r$-combination (subset): $\dbinom nr=C^n_r=\dfrac{P^n_r}{r!}=\dfrac{n!}{r!(n-r)!}$.
+\begin{idea}Permutation = choose a subset, then arrange it: $P^n_r=C^n_r\cdot r!$. Dividing by $r!$ ``forgets'' the order.\end{idea}
+\textbf{Symmetry:} $\binom nr=\binom n{n-r}$ (choosing who's in = choosing who's out).\\
+\textbf{Pascal:} $\binom nr=\binom{n-1}{r-1}+\binom{n-1}r$. \emph{Combinatorial proof:} does the subset contain element 1 or not?\\
+\textbf{With repetition:} $r$-permutations of $n$ objects $=n^r$.\\
+\textbf{Multiset permutations:} $r$ objects, $r_i$ of type $i$:
+\[P(r;r_1,\dots,r_n)=\frac{r!}{r_1!\,r_2!\cdots r_n!}\]
+(label identical copies, then divide out the $r_i!$ overcount). E.g.\ $aaabc$: $5!/3!=20$.
+
+\subsection{Standard tricks}
+\begin{itemize}
+\item \textbf{Blocks together:} arrange blocks, then within blocks. 4 math, 3 chem, 2 hist, 1 lang books grouped: $4!\cdot4!\,3!\,2!\,1!=6912$.
+\item \textbf{Gap method (no two adjacent):} line up the $n-m$ ``good'' items, giving $n-m+1$ gaps (incl.\ ends); pick $m$: $\binom{n-m+1}{m}$.
+\item \textbf{Restriction by complement:} committees of 3 from 7 men avoiding 2 feuding men: $\binom73-\binom22\binom51=30$.
+\item Separate rankings: $6$ men, $4$ women ranked among themselves: $6!\,4!$.
+\end{itemize}
+
+\subsection{Binomial theorem}
+\[(x+y)^n=\sum_{r=0}^n\binom nr x^{n-r}y^r\]
+\emph{Why:} from $n$ factors $(x+y)$, choose which $r$ factors give $y$: $\binom nr$ ways. (Also provable by induction + Pascal.)
+\begin{itemize}
+\item $x=y=1$: $\sum_r\binom nr=2^n$ = \#subsets of an $n$-set (each element in/out). Nonempty: $2^n-1$.
+\item $x=1,y=-1$: $\sum_r(-1)^r\binom nr=0$ $(n\ge1)$.
+\item Hence $\binom n0+\binom n2+\cdots=\binom n1+\binom n3+\cdots=2^{n-1}$.
+\end{itemize}
+
+\subsection{Multinomial coefficients}
+\#ways to put $n$ \textbf{distinct} objects into $m$ \textbf{distinct} boxes with $n_i$ in box $i$ ($\sum n_i=n$):
+\[\binom{n}{n_1,\dots,n_m}=\binom n{n_1}\binom{n-n_1}{n_2}\cdots=\frac{n!}{n_1!\cdots n_m!}\]
+\textbf{Multinomial Thm:}\[(x_1+\cdots+x_m)^n=\sum_{n_1+\cdots+n_m=n}\binom{n}{n_1,\dots,n_m}x_1^{n_1}\cdots x_m^{n_m}\]
+
+%==================================================
+\section{Axioms of Probability}
+\subsection{Sample space and events}
+$S$ = set of all outcomes; event $E\subseteq S$. $E\cup F$ (at least one), $E\cap F=EF$ (both), $E^c$ (not $E$), $S^c=\emptyset$. \textbf{Mutually exclusive:} $EF=\emptyset$. $E\subseteq F$: $E$ occurs $\Rightarrow F$ occurs.\\
+Commutative, associative, distributive laws: $(E\cup F)G=EG\cup FG$, $\;EF\cup G=(E\cup G)(F\cup G)$.\\
+\textbf{De Morgan:} $\big(\bigcup E_i\big)^c=\bigcap E_i^c$, $\;\big(\bigcap E_i\big)^c=\bigcup E_i^c$.
+
+\subsection{The three axioms}
+\textbf{A1:} $0\le \PP(E)\le1$. \quad\textbf{A2:} $\PP(S)=1$.\\
+\textbf{A3:} $E_1,E_2,\dots$ mutually exclusive $\Rightarrow\PP\big(\bigcup_{i=1}^\infty E_i\big)=\sum_{i=1}^\infty\PP(E_i)$.\\
+Consequences: $\PP(\emptyset)=0$; finite additivity (pad with $\emptyset$'s).
+
+\subsection{Simple propositions}
+\begin{itemize}
+\item $\PP(E^c)=1-\PP(E)$.
+\item $E\subseteq F\Rightarrow \PP(E)\le\PP(F)$ \ (write $F=E\cup E^cF$).
+\item $\PP(E\cup F)=\PP(E)+\PP(F)-\PP(EF)$.
+\item $\PP(E\cup F\cup G)=\PP(E)+\PP(F)+\PP(G)-\PP(EF)-\PP(EG)-\PP(FG)+\PP(EFG)$.
+\end{itemize}
+\textbf{Inclusion--exclusion:}
+\[\PP\Big(\bigcup_{i=1}^nE_i\Big)=\sum_{r=1}^n(-1)^{r+1}\!\!\sum_{i_1<\cdots<i_r}\!\!\PP(E_{i_1}\cdots E_{i_r})\]
+\begin{idea}Adding singles over-counts overlaps; subtracting pairs over-removes triple overlaps; and so on, alternately.\end{idea}
+\textbf{Bounds} (truncating alternately over/under-shoots):\\
+$\PP(\bigcup E_i)\le\sum\PP(E_i)$ (Boole / union bound);\\
+$\PP(\bigcup E_i)\ge\sum\PP(E_i)-\sum_{i<j}\PP(E_iE_j)$; next truncation is $\le$ again.
+
+\subsection{Equally likely outcomes}
+$|S|=N$ finite, all equally likely $\Rightarrow \PP(E)=\dfrac{|E|}{|S|}$.
+\subsection{Matching (hat) problem}
+$N$ people pick hats at random, $E_i$ = person $i$ gets own hat. $\PP(E_{i_1}\cdots E_{i_n})=\frac{(N-n)!}{N!}$, $\binom Nn$ such terms, so by incl.--excl.:
+\[\PP(\text{no match})=\sum_{i=0}^N\frac{(-1)^i}{i!}\;\xrightarrow{N\to\infty}\;e^{-1}\approx0.368\]
+$\PP(\text{exactly }k)=\frac1{k!}\sum_{i=0}^{N-k}\frac{(-1)^i}{i!}\approx\frac{e^{-1}}{k!}$, i.e.\ \#matches $\approx$ Poisson(1).
+
+
+%==================================================
+\section{Conditional Probability and Independence}
+\subsection{Conditional probability}
+If $\PP(F)>0$: \quad $\PP(E\mid F)=\dfrac{\PP(EF)}{\PP(F)}$.
+\begin{idea}$F$ becomes the new sample space: keep only outcomes in $F$ and rescale so they sum to 1.\end{idea}
+\textbf{Multiplication rule:}\[\PP(E_1\cdots E_n)=\PP(E_1)\PP(E_2|E_1)\PP(E_3|E_1E_2)\cdots\PP(E_n|E_1\cdots E_{n-1})\]
+\begin{itemize}
+\item Urn 8R, 4W, 2 draws w/o repl., both red: $\frac8{12}\cdot\frac7{11}=\frac{14}{33}$.
+\item Deck into 4 piles of 13, each pile gets one ace: $\frac{39}{51}\cdot\frac{26}{50}\cdot\frac{13}{49}\approx0.105$.
+\item Bridge: N+S hold 8 spades; E has exactly 3 of the other 5: $\binom53\binom{21}{10}/\binom{26}{13}\approx0.339$ (reduced sample space).
+\end{itemize}
+
+\subsection{Law of total probability}
+$\PP(E)=\PP(E|F)\PP(F)+\PP(E|F^c)\big(1-\PP(F)\big)$.\\
+General: $F_1,\dots,F_n$ a partition of $S$ (disjoint, exhaustive):
+\[\PP(E)=\sum_{i=1}^n\PP(E|F_i)\PP(F_i)\]
+\begin{idea}$\PP(E)$ is a \emph{weighted average} of the conditional probabilities; condition on whatever makes the problem easy (often the first step).\end{idea}
+
+\subsection{Bayes's formula}
+\[\PP(F_j|E)=\frac{\PP(E|F_j)\PP(F_j)}{\sum_i\PP(E|F_i)\PP(F_i)}\]
+Prior $\PP(F_j)$ $\to$ posterior $\PP(F_j|E)$ after seeing evidence $E$.
+
+\textbf{Odds} of $A$: $\dfrac{\PP(A)}{\PP(A^c)}=\dfrac{\PP(A)}{1-\PP(A)}$ (``$\alpha$ to 1''). Updating:
+\[\frac{\PP(H|E)}{\PP(H^c|E)}=\frac{\PP(H)}{\PP(H^c)}\cdot\frac{\PP(E|H)}{\PP(E|H^c)}\]
+new odds = old odds $\times$ likelihood ratio.
+
+\subsection{Diagnostic tests: sensitivity, specificity, prevalence}
+$D$ = has disease, $+$ / $-$ = test result.\\
+\begin{tabular}{@{}l@{\ }l@{}}
+\textbf{Prevalence} & $\pi=\PP(D)$ \ (prior, base rate)\\
+\textbf{Sensitivity} & $\PP(+\mid D)$ \ (true positive rate)\\
+\textbf{Specificity} & $\PP(-\mid D^c)$ \ (true negative rate)\\
+False pos.\ rate & $\PP(+\mid D^c)=1-\text{spec}$\\
+False neg.\ rate & $\PP(-\mid D)=1-\text{sens}$
+\end{tabular}\\[2pt]
+
+
+\subsection{Independence}
+$E,F$ independent $\iff\PP(EF)=\PP(E)\PP(F)$ ($\iff\PP(E|F)=\PP(E)$ when $\PP(F)>0$).
+\begin{itemize}
+\item $E,F$ indep.\ $\Rightarrow$ $E,F^c$ indep.\ (and $E^c,F^c$).
+\item \textbf{Three events} independent: all \emph{four} conditions $\PP(EFG)=\PP(E)\PP(F)\PP(G)$ \emph{and} each pair. Pairwise $\not\Rightarrow$ mutual (e.g.\ 2 dice: sum$=7$, die1$=4$, die2$=3$).
+\item If $E,F,G$ indep., $E$ is indep.\ of any event built from $F,G$ (e.g.\ $F\cup G$).
+\item $E_1,\dots,E_n$ indep.: product rule for \emph{every} subcollection. Infinite family: every finite subfamily.
+\item Disjoint $\ne$ independent! (Disjoint with positive probs $\Rightarrow$ dependent.)
+\end{itemize}
+
+\subsection{Independent trials (success prob.\ $p$)}
+\begin{itemize}
+\item $\PP(\ge1\text{ success in }n)=1-(1-p)^n$.
+\item $\PP(\text{exactly }k\text{ in }n)=\binom nk p^k(1-p)^{n-k}$.
+\item Parallel system works iff $\ge1$ works: $1-\prod(1-p_i)$.
+\item \textbf{$E$ before $F$} ($E,F$ disjoint, repeated trials): $\dfrac{\PP(E)}{\PP(E)+\PP(F)}$. Sum 5 before 7: $\frac{4}{4+6}=\frac25$.
+\item Coupons ($k$ collected, type $i$ w.p.\ $p_i$): $\PP(A_i)=1-(1-p_i)^k$, $\PP(A_i\cup A_j)=1-(1-p_i-p_j)^k$.
+\end{itemize}
+
+\subsection{Gambler's ruin}
+A has $i$, B has $N-i$; A wins each round w.p.\ $p$, $q=1-p$. Condition on first toss: $P_i=pP_{i+1}+qP_{i-1}$, $P_0=0$, $P_N=1$.
+\[P_i=\begin{cases}\dfrac{1-(q/p)^i}{1-(q/p)^N},&p\ne\tfrac12\\[4pt]\dfrac iN,&p=\tfrac12\end{cases}\]
+$P_i+Q_i=1$: game ends w.p.\ 1. ($i=5,N=15$: $p=.5\to\frac13$; $p=.6\to\approx.87$.)
+
+\subsection{$\PP(\cdot\mid F)$ is a probability}
+$Q(E)=\PP(E|F)$ satisfies A1 to A3, so every result holds conditionally, e.g.\ $\PP(E_1\cup E_2|F)=\PP(E_1|F)+\PP(E_2|F)-\PP(E_1E_2|F)$, and
+\[\PP(E|F)=\PP(E|GF)\PP(G|F)+\PP(E|G^cF)\PP(G^c|F)\]
+\textbf{Conditional independence} given $F$: $\PP(EG|F)=\PP(E|F)\PP(G|F)$ $\iff\PP(E|GF)=\PP(E|F)$.
+\begin{idea}Cond.\ indep.\ $\not\Rightarrow$ indep. Two students, random easy/hard question: given the question they answer independently, but one getting it right suggests ``easy'', raising the other's chance. ($\PP(E)=\PP(G)=0.7$, $\PP(EG)=0.53\ne0.49$.)\end{idea}
+
+%==================================================
+\section{Random Variables}
+\subsection{Basics}
+RV $X:S\to\mathbb R$. \textbf{pmf} $p(x)=\PP\{X=x\}$, $p(x)\ge0$, $\sum_x p(x)=1$ (use this to find a constant $c$, e.g.\ $p(i)=c\lambda^i/i!\Rightarrow c=e^{-\lambda}$).\\
+\textbf{cdf} $F(a)=\PP\{X\le a\}=\sum_{x\le a}p(x)$: step function, jump $p(x_i)$ at $x_i$.
+
+\subsection{Expectation}
+$\E[X]=\sum_x x\,p(x)$ \ (centre of mass of the pmf).\\
+\textbf{Indicator} $I_A$: $\E[I_A]=\PP(A)$.\\
+\textbf{LOTUS:} $\E[g(X)]=\sum_x g(x)p(x)$ (no need for the pmf of $g(X)$).\\
+\textbf{Linearity:} $\E[aX+b]=a\E[X]+b$; \ $\E\big[\sum X_i\big]=\sum\E[X_i]$ (\emph{always}, no independence needed).
+\begin{idea}Counting trick: write $X=\sum I_i$ (indicators), then $\E[X]=\sum\PP(A_i)$. E.g.\ sum of $n$ dice: $3.5n$; successes in trials with probs $p_i$: $\sum p_i$.\end{idea}
+\textbf{Inspection paradox} (buses of 36, 40, 44): random \emph{bus} has mean $40$; random \emph{student's} bus has mean $\frac{36^2+40^2+44^2}{120}\approx40.27$ (big buses are sampled more).
+
+\subsection{Variance}
+$\Var(X)=\E[(X-\mu)^2]=\E[X^2]-(\E[X])^2$, \ $\mathrm{SD}=\sqrt{\Var}$.\\
+$\Var(aX+b)=a^2\Var(X)$ (shifting doesn't change spread). Fair die: $\E=\frac72$, $\Var=\frac{35}{12}$.\\
+Sum of indicators: $\E[X^2]=\sum_i\PP(A_i)+\sum_{i\ne j}\PP(A_iA_j)$, then subtract $(\E X)^2$.
+
+\subsection{Bernoulli and Binomial$(n,p)$}
+Bernoulli: $X\in\{0,1\}$, $\PP(X=1)=p$; $\E=p$, $\Var=p(1-p)$.\\
+Binomial = \#successes in $n$ indep.\ trials:
+\[\PP\{X=k\}=\binom nk p^k(1-p)^{n-k},\quad \E=np,\;\Var=np(1-p)\]
+Ratio $\frac{\PP\{X=k\}}{\PP\{X=k-1\}}=\frac{(n-k+1)p}{k(1-p)}$: increases then decreases; \textbf{mode} at $\lfloor(n+1)p\rfloor$.
+
+\subsection{Poisson$(\lambda)$}
+\[\PP\{X=i\}=e^{-\lambda}\frac{\lambda^i}{i!},\ i=0,1,\dots\qquad\E=\Var=\lambda\]
+\textbf{Approximates Bin$(n,p)$} when $n$ large, $p$ small, $\lambda=np$ moderate (since $(1-\lambda/n)^n\to e^{-\lambda}$).
+\begin{idea}Many independent rare chances $\Rightarrow$ Poisson: typos per page, 100-year-olds, wrong numbers dialled, $\alpha$-particles, customers per day, hat matches ($\lambda=1$).\end{idea}
+
+\subsection{Geometric$(p)$}
+$X$ = \#trials until the first success:
+\[\PP\{X=n\}=(1-p)^{n-1}p,\ n\ge1;\quad \PP\{X\ge k\}=(1-p)^{k-1}\]
+$\E[X]=\dfrac1p$, \ $\Var(X)=\dfrac{1-p}{p^2}$. (Die until a 1: 6 rolls on average.)
+
+\subsection{Properties of the cdf}
+(1) $F$ nondecreasing; (2) $\lim_{b\to\infty}F(b)=1$; (3) $\lim_{b\to-\infty}F(b)=0$; (4) right-continuous: $b_n\downarrow b\Rightarrow F(b_n)\to F(b)$.
+\begin{key}
+$\PP\{a<X\le b\}=F(b)-F(a)$\\
+$\PP\{X<b\}=F(b^-)=\lim_{n}F(b-\tfrac1n)$\\
+$\PP\{X=b\}=F(b)-F(b^-)$ (jump size)\\
+$\PP\{X>b\}=1-F(b)$, \ $\PP\{X\ge b\}=1-F(b^-)$
+\end{key}
+
+\subsection{Which model?}
+\begin{tabular}{@{}l@{\ }l@{}}
+Fixed $n$ trials, count successes & Binomial$(n,p)$\\
+Rare events, large $n$, count & Poisson$(np)$\\
+Wait for first success & Geometric$(p)$\\
+Draw w/o replacement & counting / cond.\ prob.\\
+``At least one'' & complement\\
+Random walk to a boundary & condition on step 1
+\end{tabular}
+
+\subsection{Distribution summary}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}l|c|c|c@{}}
+ & pmf & $\E[X]$ & $\Var(X)$\\\hline
+Bern$(p)$ & $p^x(1-p)^{1-x}$ & $p$ & $p(1-p)$\\
+Bin$(n,p)$ & $\binom nk p^k(1-p)^{n-k}$ & $np$ & $np(1-p)$\\
+Poi$(\lambda)$ & $e^{-\lambda}\lambda^k/k!$ & $\lambda$ & $\lambda$\\
+Geom$(p)$ & $(1-p)^{k-1}p$ & $1/p$ & $(1-p)/p^2$
+\end{tabular}
+\renewcommand{\arraystretch}{1}
+
+\subsection{Useful series}
+$\sum_{k\ge0}r^k=\frac1{1-r}$, \ $\sum_{k\ge1}kr^{k-1}=\frac1{(1-r)^2}$ $(|r|<1)$\\
+$e^x=\sum_{k\ge0}\frac{x^k}{k!}$, \ $(1+\frac xn)^n\to e^x$\\
+$\sum_{k=1}^nk=\frac{n(n+1)}2$, \ $\sum_{k=1}^nk^2=\frac{n(n+1)(2n+1)}6$
+
+\end{multicols*}
+\end{document}
