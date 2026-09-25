@@ -1,0 +1,410 @@
+\documentclass[9pt,landscape]{extarticle}
+\usepackage[letterpaper,margin=0.45in]{geometry}
+\usepackage{multicol}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+\definecolor{kw}{RGB}{0,92,197}
+\definecolor{accent}{RGB}{160,40,140}
+\definecolor{accent2}{RGB}{90,70,160}
+\definecolor{cmt}{RGB}{110,110,110}
+\definecolor{rowgray}{gray}{0.9}
+
+\lstdefinestyle{py}{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{kw},
+  morekeywords={None,True,False,lambda},
+  commentstyle=\color{cmt}\itshape,
+  stringstyle=\color{accent},
+  showstringspaces=false,
+  columns=fullflexible,
+  keepspaces=true,
+  breaklines=true,
+  breakatwhitespace=true,
+  aboveskip=3pt,
+  belowskip=3pt,
+  xleftmargin=0pt,
+}
+\lstset{style=py}
+
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{6pt}{3pt}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{4pt}{2pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+\setlength{\columnsep}{16pt}
+\pagestyle{empty}
+
+\newcommand{\hl}[1]{\textcolor{accent}{#1}}
+\newcommand{\hll}[1]{\textcolor{accent2}{#1}}
+\newcommand{\kw}[1]{\textcolor{kw}{\texttt{#1}}}
+
+\begin{document}
+\begin{multicols*}{3}
+
+\fbox{\parbox{0.95\linewidth}{\centering
+{\Large\bfseries CS1101S Cheatsheet}\\
+for midterms AY26-27\\
+\textcolor{accent2}{adapted from m.\ zaidan}}}
+
+\section*{Recursion \& Iteration}
+Recursion: \hl{Increasing} deferred operations\\
+Iteration: \textcolor{kw}{Constant} deferred operations\\
+(rule of thumb: if the final call is the application call, it is usually \emph{iterative})
+
+\section*{Definitions of List \& Tree}
+\begin{lstlisting}
+pair = lambda x, y: (lambda f: f(x, y))
+head = lambda p: p(lambda x, y: x)
+tail = lambda p: p(lambda x, y: y)
+\end{lstlisting}
+
+A linked list is either \kw{None} or \hl{a pair whose tail is a linked list.}\\
+A tree is either \kw{None} or \hl{head is an element, tail is a tree} or \hll{head is a tree, tail is a tree}
+
+\subsection*{Source built-ins, in Python}
+\begin{lstlisting}
+
+def is_llist(xs):
+    return (True if is_none(xs)
+            else is_llist(tail(xs)) if is_pair(xs)
+            else False)
+
+def length(xs):
+    return 0 if is_none(xs) else 1 + length(tail(xs))
+
+def append(xs, ys):
+    return (ys if is_none(xs)
+            else pair(head(xs), append(tail(xs), ys)))
+
+def remove(x, xs):          # first occurrence only
+    return (None if is_none(xs)
+            else tail(xs) if head(xs) == x
+            else pair(head(xs), remove(x, tail(xs))))
+\end{lstlisting}
+
+\section*{List Abstractions}
+\begin{lstlisting}
+def map(f, xs):
+    return (None if is_none(xs)
+            else pair(f(head(xs)), map(f, tail(xs))))
+\end{lstlisting}
+Recursive process; \textbf{time: O(n), space: O(n)}, where n is the length of xs.
+
+\begin{lstlisting}
+def filter(pred, xs):
+    return (None if is_none(xs)
+            else pair(head(xs), filter(pred, tail(xs)))
+                 if pred(head(xs))
+            else filter(pred, tail(xs)))
+\end{lstlisting}
+Recursive process; \textbf{time: O(n), space: O(n)}, where n is the length of xs.
+
+\begin{lstlisting}
+def reduce(op, initial, xs):
+    return (initial if is_none(xs)
+            else op(head(xs),
+                    reduce(op, initial, tail(xs))))
+
+reduce(lambda curr, wish: ..., initial, xs)
+\end{lstlisting}
+Recursive process; \textbf{time: O(n), space: O(n)}, where n is the length of xs assuming op takes constant time.
+
+\section*{Tree Abstractions}
+\begin{lstlisting}
+def reduce_tree(f, op, initial, tree):
+    return reduce(lambda x, ys:
+            op(reduce_tree(f, op, initial, x), ys)
+            if is_llist(x)
+            else op(f(x), ys),
+        initial, tree)
+
+def map_tree(f, tree):
+    return map(lambda sub_tree:
+            f(sub_tree) if not is_llist(sub_tree)
+            else map_tree(f, sub_tree),
+        tree)
+
+def flatten_tree(xs):
+    def h(xs, prev):
+        return (prev if is_none(xs)
+                else append(flatten_tree(xs), prev)
+                     if is_llist(xs)
+                else pair(xs, prev))
+    return reduce(h, None, xs)
+\end{lstlisting}
+
+\subsection*{Binary Search Trees}
+\begin{lstlisting}
+def make_empty_tree(): return None
+def is_empty_tree(t): return is_none(t)
+def make_tree(e, l, r): return llist(e, l, r)
+def entry(t): return head(t)
+def left_branch(t): return head(tail(t))
+def right_branch(t): return head(tail(tail(t)))
+
+def insert(bst, item):
+    if is_empty_tree(bst):
+        return make_tree(item, make_empty_tree(),
+                               make_empty_tree())
+    elif item < entry(bst):
+        return make_tree(entry(bst),
+                         insert(left_branch(bst), item),
+                         right_branch(bst))
+    elif item > entry(bst):
+        return make_tree(entry(bst),
+                         left_branch(bst),
+                         insert(right_branch(bst), item))
+    else:
+        return bst
+
+def find(bst, name):
+    return (False if is_empty_tree(bst)
+            else True if name == entry(bst)
+            else find(left_branch(bst), name)
+                 if name < entry(bst)
+            else find(right_branch(bst), name))
+\end{lstlisting}
+
+\section*{Permutations \& Combinations}
+\begin{lstlisting}
+def permutations(s):
+    return (llist(None) if is_none(s)
+        else reduce(append, None,
+            map(lambda x: map(lambda p: pair(x, p),
+                        permutations(remove(x, s))),
+                s)))
+
+def subsets(s):
+    return reduce(
+        lambda x, s1: append(s1,
+            map(lambda ss: pair(x, ss), s1)),
+        llist(None),
+        s)
+
+def choose(n, r):
+    if n < 0 or r < 0:
+        return 0
+    elif r == 0:
+        return 1
+    else:
+        to_use = choose(n - 1, r - 1)
+        not_to_use = choose(n - 1, r)
+        return to_use + not_to_use
+
+def combinations(xs, r):
+    if (r != 0 and is_none(xs)) or r < 0:
+        return None
+    elif r == 0:
+        return llist(None)
+    else:
+        no = combinations(tail(xs), r)
+        yes = combinations(tail(xs), r - 1)
+        yes_item = map(lambda x: pair(head(xs), x),
+                       yes)
+        return append(no, yes_item)
+
+def makeup_amount(x, coins):
+    if x == 0:
+        return llist(None)
+    elif x < 0 or is_none(coins):
+        return None
+    else:
+        combi_A = makeup_amount(x, tail(coins))
+        combi_B = makeup_amount(x - head(coins),
+                                tail(coins))
+        combi_C = map(lambda x: pair(head(coins), x),
+                      combi_B)
+        return append(combi_A, combi_C)
+\end{lstlisting}
+
+\section*{Rule of Thumb for Abstractions}
+{\small
+\begin{tabular}{@{}ll@{}}
+Is input a llist? & if not, don't use \\
+Is length(output) = length(input)? & use \emph{map} \\
+Are items in output = items in input? & use \emph{filter} \\
+Else & use \emph{reduce}
+\end{tabular}}
+
+\section*{Useful Math Functions}
+\begin{lstlisting}
+import math
+math.pow(base, exponent)   # or base ** exponent
+round(x)       # banker's rounding: round(2.5) == 2
+math.floor(x)  # a // b is floor division
+math.ceil(x)
+math.sqrt(x)
+\end{lstlisting}
+
+\newpage
+
+
+\section*{Orders of Growth}
+for $r(n)$,
+
+\textbf{Big O} $O(g(n))$: if there is a positive constant $k$ such that $r(n) \le k \cdot g(n)$ for any sufficiently large value of $n$\\
+\textbf{Big Theta} $\Theta(g(n))$: if there are positive constants $k_1$ and $k_2$ and a number $n_0$ such that $k_1 \cdot g(n) \le r(n) \le k_2 \cdot g(n)$ for any $n > n_0$.\\
+\textbf{Big Omega} $\Omega(g(n))$: if there is a positive constant $k$ such that $k \cdot g(n) \le r(n)$ for any sufficiently large value of $n$\\
+\textbf{Order (ascending):} $1, \log n, n, n\log n, n^2, n^3, 2^n, 3^n, n^n$
+
+Ignore constants, lower order terms. $O(2n) = O(3n) = O(n)$\\
+For a sum, take the larger term. $O(n) + O(n^2) = O(n^2)$\\
+For a product, multiply the two terms. $O(n) \times O(n) = O(n^2)$
+
+\section*{Recurrence Relations}
+{\small
+\begin{tabular}{@{}cc@{}}
+\toprule
+$T(n)$ & Solution \\
+\midrule
+$O(1) + T(n-1)$ & \\
+$O(1) + 2T(n/2)$ & $O(n)$ \\
+$O(n) + T(n/2)$ & \\
+\rowcolor{rowgray} $O(1) + T(n/2)$ & $O(\log n)$ \\
+$O(\log n) + T(n-1)$ & \\
+$O(n) + 2T(n/2)$ & \multirow{-2}{*}{$O(n \log n)$} \\
+\rowcolor{rowgray} $O(n) + T(n-1)$ & $O(n^2)$ \\
+$O(n^k) + T(n-1)$ & $O(n^{k+1})$ \\
+\rowcolor{rowgray} $O(n) + 2T(n-1)$ & $O(2^n)$ \\
+\bottomrule
+\end{tabular}}
+
+\section*{Master Theorem}
+For $T(n) = a\,T(n/b) + f(n)$, with $a \ge 1$, $b > 1$:\\
+$a$ = no.\ of subproblems, $n/b$ = size of each, $f(n)$ = work to split and combine.
+
+\textbf{Shortcut} when $f(n) = \Theta(n^d)$: compare $a$ with $b^d$.\\
+$a < b^d \Rightarrow \Theta(n^d)$ \hfill root wins\\
+$a = b^d \Rightarrow \Theta(n^d \log n)$ \hfill tie\\
+$a > b^d \Rightarrow \Theta(n^{\log_b a})$ \hfill leaves win
+
+{\small
+\begin{tabular}{@{}lccl@{}}
+\toprule
+Recurrence & $a,b,d$ & Case & Result \\
+\midrule
+Binary search: $T(n/2) + O(1)$ & $1,2,0$ & tie & $\Theta(\log n)$ \\
+\rowcolor{rowgray} Merge sort: $2T(n/2) + O(n)$ & $2,2,1$ & tie & $\Theta(n\log n)$ \\
+Tree traversal: $2T(n/2) + O(1)$ & $2,2,0$ & leaves & $\Theta(n)$ \\
+\rowcolor{rowgray} $T(n/2) + O(n)$ & $1,2,1$ & root & $\Theta(n)$ \\
+\bottomrule
+\end{tabular}}
+
+Only for splitting by a \emph{factor} ($n/b$). For $T(n-1)$ recurrences, use the table above.
+
+\section*{Sorting/Search Algorithms}
+{\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \multicolumn{2}{c}{\textbf{Time}} & \textbf{Space} \\
+ & best & worst & \\
+\midrule
+Binary Search & $\Theta(\log n)$ & $O(\log n)$ & $O(1)$ \\
+\rowcolor{rowgray} Selection Sort & $\Theta(n^2)$ & $O(n^2)$ & $O(n)$ \\
+Insertion Sort & $\Theta(n)$ & $O(n^2)$ & $O(n)$ \\
+\rowcolor{rowgray} Merge Sort & $\Theta(n\log n)$ & $O(n\log n)$ & $O(n\log n)$ \\
+Quick Sort & $\Theta(n\log n)$ & $O(n^2)$ & $O(n^2)$ \\
+\bottomrule
+\end{tabular}}
+
+\subsection*{Selection Sort}
+\begin{lstlisting}
+def smallest(xs):
+    return reduce(lambda x, y: x if x < y else y,
+                      head(xs), tail(xs))
+
+def selection_sort(xs):
+    if is_none(xs):
+        return xs
+    else:
+        x = smallest(xs)
+        return pair(x, selection_sort(remove(x, xs)))
+\end{lstlisting}
+
+\subsection*{Merge Sort}
+\begin{lstlisting}
+def merge(xs, ys):
+    if is_none(xs):
+        return ys
+    elif is_none(ys):
+        return xs
+    else:
+        x = head(xs)
+        y = head(ys)
+        return (pair(x, merge(tail(xs), ys)) if x < y
+                else pair(y, merge(xs, tail(ys))))
+
+middle = lambda n: n // 2     # math.floor(n / 2)
+
+def take(xs, n):
+    return (None if n == 0
+            else pair(head(xs), take(tail(xs), n - 1)))
+
+def drop(xs, n):
+    return xs if n == 0 else drop(tail(xs), n - 1)
+
+def merge_sort(xs):
+    if is_none(xs) or is_none(tail(xs)):
+        return xs
+    else:
+        m = middle(length(xs))
+        return merge(merge_sort(take(xs, m)),
+                     merge_sort(drop(xs, m)))
+\end{lstlisting}
+
+\subsection*{Quick Sort}
+\begin{lstlisting}
+def partition(xs, p):
+    return pair(filter(lambda x: x <= p, xs),
+                filter(lambda x: x > p, xs))
+
+def quicksort(xs):
+    if is_none(xs):
+        return None
+    elif is_none(tail(xs)):
+        return xs
+    else:
+        pivot = head(xs)
+        ptn = partition(tail(xs), pivot)
+        return reduce(append, None,
+            llist(quicksort(head(ptn)), llist(pivot),
+                 quicksort(tail(ptn))))
+\end{lstlisting}
+
+\section*{Continuation-Passing Style (CPS)}
+Passing the deferred operation as a function in an extra argument. Any recursive function can be converted this way.
+
+\begin{lstlisting}
+def fac_cps(n, c):
+    return (c(1) if n == 1
+            else fac(n - 1, lambda x: c(n * x)))
+
+def append_cps(xs, ys, c):
+    return (c(ys) if is_none(xs)
+            else append_cps(tail(xs), ys,
+                lambda res: c(pair(head(xs), res))))
+
+def reduce_cps(op, initial, xs, c):
+    return (c(initial) if is_none(xs)
+            else reduce_cps(op, initial, tail(xs),
+                lambda res: c(op(head(xs), res))))
+
+\end{lstlisting}
+
+\textbf{Trace:} \kw{fac(3, I)} $\to$ \kw{fac(2, lambda r: I(3*r))} $\to$ \kw{fac(1, lambda r: I(3*(2*r)))} $\to$ \kw{fac(0, \dots)} $\to$ \kw{k(1)} $=$ \kw{3*(2*(1*1))} $=6$
+
+\small{I = lambda x: x}
+
+Iterative process, but \textbf{space is O(n).}
+
+\end{multicols*}
+\end{document}
